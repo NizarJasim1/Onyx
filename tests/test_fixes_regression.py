@@ -215,9 +215,23 @@ def test_obstacle2_hardening():
     check("clean JSON not flagged as block", detect_block(200, {"id":42,"owner":"a"}) is None)
     g1=_RateGovernor(0.1,0.5,seed=7); g2=_RateGovernor(0.1,0.5,seed=7)
     check("seeded jitter reproducible", [round(g1._rng.uniform(0,1),5) for _ in range(3)]==[round(g2._rng.uniform(0,1),5) for _ in range(3)])
-    sc=ScopeConfig(allowed_hosts=["x"],min_request_interval=1.0)
-    t1=HTTPTarget("https://x",scope=sc); t2=HTTPTarget("https://x",scope=sc)
-    check("global governor shared across same-egress targets", t1._gov is t2._gov)
+    # Constructing an HTTPTarget only checks that `requests` is importable; no
+    # request is sent here, so a stub keeps this test stdlib-only.
+    import sys, types
+    stubbed = "requests" not in sys.modules
+    if stubbed:
+        try:
+            import requests  # noqa: F401
+            stubbed = False
+        except ImportError:
+            sys.modules["requests"] = types.ModuleType("requests")
+    try:
+        sc=ScopeConfig(allowed_hosts=["x"],min_request_interval=1.0)
+        t1=HTTPTarget("https://x",scope=sc); t2=HTTPTarget("https://x",scope=sc)
+        check("global governor shared across same-egress targets", t1._gov is t2._gov)
+    finally:
+        if stubbed:
+            sys.modules.pop("requests", None)
 
 
 
