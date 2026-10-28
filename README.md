@@ -1,6 +1,6 @@
 # ONYX
 
-[![ci](https://github.com/NizarJasim1/onyx/actions/workflows/ci.yml/badge.svg)](https://github.com/NizarJasim1/onyx/actions/workflows/ci.yml) ![python](https://img.shields.io/static/v1?label=python&message=3.10+to+3.12&color=3776AB) ![deps](https://img.shields.io/badge/runtime%20deps-none-success) ![license](https://img.shields.io/badge/license-MIT-blue)
+[![ci](https://github.com/NizarJasim1/onyx/actions/workflows/ci.yml/badge.svg)](https://github.com/NizarJasim1/onyx/actions/workflows/ci.yml) ![python](https://img.shields.io/static/v1?label=python&message=3.10+to+3.12&color=3776AB) ![deps](https://img.shields.io/badge/runtime%20deps-none-success) ![license](https://img.shields.io/badge/license-PolyForm%20Noncommercial-blue)
 
 ONYX is a black-box engine for finding **authorization bugs** in web APIs: IDOR/BOLA,
 mass assignment (BOPLA), broken function-level authorization, and the business-logic
@@ -204,7 +204,13 @@ staying inside a program's policy is on you. See [`SECURITY.md`](SECURITY.md).
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE).
+ONYX is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+You can read, run, modify and share it for research, learning, personal projects and
+other noncommercial work.
+
+Commercial use, such as testing applications for paying clients or building ONYX into
+a paid product or service, needs a commercial license. Reach out through
+[GitHub](https://github.com/NizarJasim1) if that's what you have in mind.
 
 ---
 

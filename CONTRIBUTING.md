@@ -38,3 +38,10 @@ These are what keep ONYX's findings trustworthy, so PRs that break them won't be
 
 That's the most valuable issue you can open. Please include the spec (with
 credentials removed), the finding report, and why you believe it's wrong.
+
+## License of contributions
+
+ONYX is released under the PolyForm Noncommercial License 1.0.0 and is also offered
+under separate commercial licenses. By opening a pull request you agree that your
+contribution is licensed under the same terms and may be included in commercially
+licensed versions of ONYX.

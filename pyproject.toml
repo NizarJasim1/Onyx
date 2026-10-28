@@ -8,13 +8,13 @@ version = "3.2.0"
 description = "ONYX: black-box authorization testing for web APIs that confirms every finding with a state read-back"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "PolyForm-Noncommercial-1.0.0" }
 authors = [{ name = "Nizar Jasim Mohammed Al-Zubaidi" }]
 keywords = ["security", "authorization", "idor", "bola", "bfla", "mass-assignment", "api-security", "pentesting", "bug-bounty"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
