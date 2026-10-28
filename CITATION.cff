@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use ONYX in research or a report, please cite it."
+title: "ONYX: black-box authorization testing confirmed by state read-back"
+type: software
+authors:
+  - given-names: Nizar Jasim Mohammed
+    family-names: Al-Zubaidi
+version: 3.2.0
+date-released: 2026-10-28
+license: MIT
+keywords:
+  - authorization
+  - API security
+  - IDOR
+  - BOLA
+  - security testing
+repository-code: https://github.com/NizarJasim1/onyx

@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "captured_at": "2026-07-05 16:01:38",
+    "n_probes": 38,
+    "n_token_gated_ok": 36,
+    "n_transport_failures": 0,
+    "n_isolated_errors": 0,
+    "tokens": {
+      "A": true,
+      "B": true,
+      "C": true
+    },
+    "categories": [
+      "authgate",
+      "bfla",
+      "bola",
+      "clean",
+      "ede",
+      "identity",
+      "jwt",
+      "massassign",
+      "provision"
+    ]
+  },
+  "users": {
+    "A": {
+      "tag": "alice",
+      "email": "alice285271091@t.com",
+      "token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhbGljZTI4NTI3MTA5MUB0LmNvbSIsImlhdCI6MTc4MzI4NTI3MywiZXhwIjoxNzgzODkwMDczLCJyb2xlIjoidXNlciJ9.FksZy934RlE4E-yghUrk2sWjUMtkQuGjEqefdknXb_DdMursu_HVtJuEJbN9y9KGDeRV51NEFdEmfdK4E8wGWS4a_I8MwFMAanKWsC7lah9p81Ujk-hlaf1wXACRqdi5hDBAbsYqgXlnpemyGxbTi5JX_OEhY7t4WpW1DDhK9BwkBwRLRjYpen9tb2mZJZe2pHBIjA2RSTBJRsYpE5f85CqkrAVqhFn8DbCF4Ye0j_DQT0Pln7NYnjk1l21X1XjawYiiSdq4NZ_OgMvJcSst-E4iG5eUlGW7X3lZdyNVEAVSQj4gulm9SCnxI0JgD4OW5VEdXPY9tttjg732PjPHiA",
+      "signup": 200,
+      "login_body": {
+        "token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhbGljZTI4NTI3MTA5MUB0LmNvbSIsImlhdCI6MTc4MzI4NTI3MywiZXhwIjoxNzgzODkwMDczLCJyb2xlIjoidXNlciJ9.FksZy934RlE4E-yghUrk2sWjUMtkQuGjEqefdknXb_DdMursu_HVtJuEJbN9y9KGDeRV51NEFdEmfdK4E8wGWS4a_I8MwFMAanKWsC7lah9p81Ujk-hlaf1wXACRqdi5hDBAbsYqgXlnpemyGxbTi5JX_OEhY7t4WpW1DDhK9BwkBwRLRjYpen9tb2mZJZe2pHBIjA2RSTBJRsYpE5f85CqkrAVqhFn8DbCF4Ye0j_DQT0Pln7NYnjk1l21X1XjawYiiSdq4NZ_OgMvJcSst-E4iG5eUlGW7X3lZdyNVEAVSQj4gulm9SCnxI0JgD4OW5VEdXPY9tttjg732PjPHiA",
+        "type": "Bearer",
+        "message": "Login successful",
+        "mfaRequired": false
+      }
+    },
+    "B": {
+      "tag": "bob",
+      "email": "bob285274660@t.com",
+      "token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJib2IyODUyNzQ2NjBAdC5jb20iLCJpYXQiOjE3ODMyODUyNzYsImV4cCI6MTc4Mzg5MDA3Niwicm9sZSI6InVzZXIifQ.hgfCFjmsdnXuzwPCf7DdiXhuMig2Z5U0lAT3J7uMCEAlWWAKbN1we7t3VdscMUoShlCE2O5f_zIGk7LoK470w4qsrzXfjx8Y6TqdJ8piIDNJFLpmAdQcHbrXDyA-xWQH40dhEC4nQYgaOnzHBZ6nzLq8wLRWNo-f9Liif75l-H2d7a-ndLBxtOSzF3DE88_vFlevM-tX6chS_F5OugBEaT37uPs69Bp6W7-tCvl86JjDfePwhiJVplWmnWG8mg2ArgUBuOYK_Oh9ua0Lg1s4bx7Tz5nmOm3D6ALEM6ktZ22tbG4EtCUCzZQOyhVrJi94M4veak57NnD5EHIWmx5Y_g",
+      "signup": 200,
+      "login_body": {
+        "token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJib2IyODUyNzQ2NjBAdC5jb20iLCJpYXQiOjE3ODMyODUyNzYsImV4cCI6MTc4Mzg5MDA3Niwicm9sZSI6InVzZXIifQ.hgfCFjmsdnXuzwPCf7DdiXhuMig2Z5U0lAT3J7uMCEAlWWAKbN1we7t3VdscMUoShlCE2O5f_zIGk7LoK470w4qsrzXfjx8Y6TqdJ8piIDNJFLpmAdQcHbrXDyA-xWQH40dhEC4nQYgaOnzHBZ6nzLq8wLRWNo-f9Liif75l-H2d7a-ndLBxtOSzF3DE88_vFlevM-tX6chS_F5OugBEaT37uPs69Bp6W7-tCvl86JjDfePwhiJVplWmnWG8mg2ArgUBuOYK_Oh9ua0Lg1s4bx7Tz5nmOm3D6ALEM6ktZ22tbG4EtCUCzZQOyhVrJi94M4veak57NnD5EHIWmx5Y_g",
+        "type": "Bearer",
+        "message": "Login successful",
+        "mfaRequired": false
+      }
+    },
+    "C": {
+      "tag": "carol",
+      "email": "carol285278018@t.com",
+      "token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjYXJvbDI4NTI3ODAxOEB0LmNvbSIsImlhdCI6MTc4MzI4NTI4MCwiZXhwIjoxNzgzODkwMDgwLCJyb2xlIjoidXNlciJ9.q2ThgbHeNE1l-5_Y63NrJOWnQ2zN-x-uC5HaEFngtL21NZPuyjapL212XZI65g7hEO4JI0nCtx-3KAVonqdR1gOuTeeneTiDgh2xqJd3bgF8WYfA78WdZwjHg4X5ypKJIufI-b56DcEXdIUSw_varQacEjrUK5ex1KwHuWjSPgwP40zveOjupqbzhoMJr56-IZ3FcYFxv_op2_Cynx2KLQJFzrXxQ1SVCt8RE6V8oGR-HNxkRFIVBUHnp02-8YX2enDbgzxzwNv4f5Tybx7H3-_oeeDGUAF2QsAdsxyy8VMN2C-N877hd5D30t9tSfQQVG4DF9rkVxYnv4UHCaJlSg",
+      "signup": 200,
+      "login_body": {
+        "token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjYXJvbDI4NTI3ODAxOEB0LmNvbSIsImlhdCI6MTc4MzI4NTI4MCwiZXhwIjoxNzgzODkwMDgwLCJyb2xlIjoidXNlciJ9.q2ThgbHeNE1l-5_Y63NrJOWnQ2zN-x-uC5HaEFngtL21NZPuyjapL212XZI65g7hEO4JI0nCtx-3KAVonqdR1gOuTeeneTiDgh2xqJd3bgF8WYfA78WdZwjHg4X5ypKJIufI-b56DcEXdIUSw_varQacEjrUK5ex1KwHuWjSPgwP40zveOjupqbzhoMJr56-IZ3FcYFxv_op2_Cynx2KLQJFzrXxQ1SVCt8RE6V8oGR-HNxkRFIVBUHnp02-8YX2enDbgzxzwNv4f5Tybx7H3-_oeeDGUAF2QsAdsxyy8VMN2C-N877hd5D30t9tSfQQVG4DF9rkVxYnv4UHCaJlSg",
+        "type": "Bearer",
+        "message": "Login successful",
+        "mfaRequired": false
+      }
+    }
+  },
+  "mailhog": [
+    {
+      "to": [
+        "alice285271091@t.com"
+      ],
+      "body": ""
+    },
+    {
+      "to": [
+        "alice285271091@t.com"
+      ],
+      "body": ""
+    },
+    {
+      "to": [
+        "bob285274660@t.com"
+      ],
+      "body": ""
+    },
+    {
+      "to": [
+        "bob285274660@t.com"
+      ],
+      "body": ""
+    }
+  ],
+  "probes": [
+    {
+      "category": "identity",
+      "label": "dashboard-A",
+      "who": "A",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 14,
+        "name": "alice",
+        "email": "alice285271091@t.com",
+        "number": "4155271091",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "identity",
+      "label": "dashboard-B",
+      "who": "B",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 15,
+        "name": "bob",
+        "email": "bob285274660@t.com",
+        "number": "4155274660",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "identity",
+      "label": "dashboard-C",
+      "who": "C",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 16,
+        "name": "carol",
+        "email": "carol285278018@t.com",
+        "number": "4155278018",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-1",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=1",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 1,
+        "mechanic": {
+          "id": 2,
+          "mechanic_code": "TRAC_JME",
+          "user": {
+            "email": "james@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 5,
+          "vin": "6NBBY70FWUM324316",
+          "owner": {
+            "email": "admin@example.com",
+            "number": "9010203040"
+          }
+        },
+        "problem_details": "My car Audi - RS7 is having issues.\nCan you give me a call on my mobile 9010203040,\nOr send me an email at admin@example.com\nThanks,\nAdmin.\n",
+        "status": "cancelled",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-1",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=1",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 1,
+        "mechanic": {
+          "id": 2,
+          "mechanic_code": "TRAC_JME",
+          "user": {
+            "email": "james@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 5,
+          "vin": "6NBBY70FWUM324316",
+          "owner": {
+            "email": "admin@example.com",
+            "number": "9010203040"
+          }
+        },
+        "problem_details": "My car Audi - RS7 is having issues.\nCan you give me a call on my mobile 9010203040,\nOr send me an email at admin@example.com\nThanks,\nAdmin.\n",
+        "status": "cancelled",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-2",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=2",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 2,
+        "mechanic": {
+          "id": 1,
+          "mechanic_code": "TRAC_JHN",
+          "user": {
+            "email": "jhon@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 2,
+          "vin": "8VAUI03PRUQ686911",
+          "owner": {
+            "email": "pogba006@example.com",
+            "number": "9876570006"
+          }
+        },
+        "problem_details": "My car MG Motor - Hector Plus is having issues.\nCan you give me a call on my mobile 9876570006,\nOr send me an email at pogba006@example.com\nThanks,\nPogba.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-2",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=2",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 2,
+        "mechanic": {
+          "id": 1,
+          "mechanic_code": "TRAC_JHN",
+          "user": {
+            "email": "jhon@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 2,
+          "vin": "8VAUI03PRUQ686911",
+          "owner": {
+            "email": "pogba006@example.com",
+            "number": "9876570006"
+          }
+        },
+        "problem_details": "My car MG Motor - Hector Plus is having issues.\nCan you give me a call on my mobile 9876570006,\nOr send me an email at pogba006@example.com\nThanks,\nPogba.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-3",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=3",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 3,
+        "mechanic": {
+          "id": 2,
+          "mechanic_code": "TRAC_JME",
+          "user": {
+            "email": "james@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 2,
+          "vin": "8VAUI03PRUQ686911",
+          "owner": {
+            "email": "pogba006@example.com",
+            "number": "9876570006"
+          }
+        },
+        "problem_details": "My car MG Motor - Hector Plus is having issues.\nCan you give me a call on my mobile 9876570006,\nOr send me an email at pogba006@example.com\nThanks,\nPogba.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-3",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=3",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 3,
+        "mechanic": {
+          "id": 2,
+          "mechanic_code": "TRAC_JME",
+          "user": {
+            "email": "james@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 2,
+          "vin": "8VAUI03PRUQ686911",
+          "owner": {
+            "email": "pogba006@example.com",
+            "number": "9876570006"
+          }
+        },
+        "problem_details": "My car MG Motor - Hector Plus is having issues.\nCan you give me a call on my mobile 9876570006,\nOr send me an email at pogba006@example.com\nThanks,\nPogba.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-4",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=4",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 4,
+        "mechanic": {
+          "id": 1,
+          "mechanic_code": "TRAC_JHN",
+          "user": {
+            "email": "jhon@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 2,
+          "vin": "8VAUI03PRUQ686911",
+          "owner": {
+            "email": "pogba006@example.com",
+            "number": "9876570006"
+          }
+        },
+        "problem_details": "My car MG Motor - Hector Plus is having issues.\nCan you give me a call on my mobile 9876570006,\nOr send me an email at pogba006@example.com\nThanks,\nPogba.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-4",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=4",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 4,
+        "mechanic": {
+          "id": 1,
+          "mechanic_code": "TRAC_JHN",
+          "user": {
+            "email": "jhon@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 2,
+          "vin": "8VAUI03PRUQ686911",
+          "owner": {
+            "email": "pogba006@example.com",
+            "number": "9876570006"
+          }
+        },
+        "problem_details": "My car MG Motor - Hector Plus is having issues.\nCan you give me a call on my mobile 9876570006,\nOr send me an email at pogba006@example.com\nThanks,\nPogba.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-5",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=5",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 5,
+        "mechanic": {
+          "id": 1,
+          "mechanic_code": "TRAC_JHN",
+          "user": {
+            "email": "jhon@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 3,
+          "vin": "0NKPZ09IHOP508673",
+          "owner": {
+            "email": "robot001@example.com",
+            "number": "9876570001"
+          }
+        },
+        "problem_details": "My car BMW - 5 Series is having issues.\nCan you give me a call on my mobile 9876570001,\nOr send me an email at robot001@example.com\nThanks,\nRobot.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bola",
+      "label": "mechanic-report-5",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=5",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 5,
+        "mechanic": {
+          "id": 1,
+          "mechanic_code": "TRAC_JHN",
+          "user": {
+            "email": "jhon@example.com",
+            "number": ""
+          }
+        },
+        "vehicle": {
+          "id": 3,
+          "vin": "0NKPZ09IHOP508673",
+          "owner": {
+            "email": "robot001@example.com",
+            "number": "9876570001"
+          }
+        },
+        "problem_details": "My car BMW - 5 Series is having issues.\nCan you give me a call on my mobile 9876570001,\nOr send me an email at robot001@example.com\nThanks,\nRobot.\n",
+        "status": "completed",
+        "created_on": "30 June, 2026, 18:39:18",
+        "updated_on": null,
+        "comments": []
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "authgate",
+      "label": "notoken",
+      "who": "none",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id=1",
+      "status": 401,
+      "transport_ok": true,
+      "resp_body": {
+        "message": "JWT Token required!"
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "authgate",
+      "label": "notoken",
+      "who": "none",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 404,
+      "transport_ok": true,
+      "resp_body": {
+        "message": "Given Email is not registered! ",
+        "status": 404
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "ede",
+      "label": "community-recent",
+      "who": "A",
+      "method": "GET",
+      "path": "/community/api/v2/community/posts/recent",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "posts": [
+          {
+            "id": "2cWvTMZimngJXv4DucSmP5",
+            "title": "Title 3",
+            "content": "Hello world 3",
+            "author": {
+              "nickname": "Robot",
+              "email": "robot001@example.com",
+              "vehicleid": "4bae9968-ec7f-4de3-a3a0-ba1b2ab5e5e5",
+              "profile_pic_url": "",
+              "created_at": "2026-06-30T18:37:49.778Z"
+            },
+            "comments": [],
+            "authorid": 3,
+            "CreatedAt": "2026-06-30T18:37:49.778Z"
+          },
+          {
+            "id": "bmqYxt4cidgQa85sX7YgjW",
+            "title": "Title 2",
+            "content": "Hello world 2",
+            "author": {
+              "nickname": "Pogba",
+              "email": "pogba006@example.com",
+              "vehicleid": "cd515c12-0fc1-48ae-8b61-9230b70a845b",
+              "profile_pic_url": "",
+              "created_at": "2026-06-30T18:37:49.777Z"
+            },
+            "comments": [],
+            "authorid": 2,
+            "CreatedAt": "2026-06-30T18:37:49.777Z"
+          },
+          {
+            "id": "NozmJjc65R9Lh67uvzDwjZ",
+            "title": "Title 1",
+            "content": "Hello world 1",
+            "author": {
+              "nickname": "Adam",
+              "email": "adam007@example.com",
+              "vehicleid": "f89b5f21-7829-45cb-a650-299a61090378",
+              "profile_pic_url": "",
+              "created_at": "2026-06-30T18:37:49.756Z"
+            },
+            "comments": [],
+            "authorid": 1,
+            "CreatedAt": "2026-06-30T18:37:49.756Z"
+          }
+        ],
+        "next_offset": null,
+        "previous_offset": null,
+        "total": 3
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "bfla",
+      "label": "admin-video-delete",
+      "who": "A",
+      "method": "DELETE",
+      "path": "/identity/api/v2/admin/videos/1",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "message": "User video deleted successfully.",
+        "status": 200
+      },
+      "req_body": null,
+      "note": "video_id=0 (0=ماكو فيديو مرفوع، الاختبار يحتاج فيديو)"
+    },
+    {
+      "category": "bfla",
+      "label": "admin-video-delete",
+      "who": "B",
+      "method": "DELETE",
+      "path": "/identity/api/v2/admin/videos/1",
+      "status": 404,
+      "transport_ok": true,
+      "resp_body": {
+        "message": "Sorry, Didn't get any profile video name for the user.",
+        "status": 404
+      },
+      "req_body": null,
+      "note": "video_id=0 (0=ماكو فيديو مرفوع، الاختبار يحتاج فيديو)"
+    },
+    {
+      "category": "jwt",
+      "label": "alg-none",
+      "who": "A",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 14,
+        "name": "alice",
+        "email": "alice285271091@t.com",
+        "number": "4155271091",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": "200=ثغرة"
+    },
+    {
+      "category": "provision",
+      "label": "vehicles-A",
+      "who": "A",
+      "method": "GET",
+      "path": "/identity/api/v2/vehicle/vehicles",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": [],
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "provision",
+      "label": "vehicles-B",
+      "who": "B",
+      "method": "GET",
+      "path": "/identity/api/v2/vehicle/vehicles",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": [],
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "massassign",
+      "label": "video-conversion-param",
+      "who": "A",
+      "method": "PUT",
+      "path": "/identity/api/v2/user/videos/1",
+      "status": 404,
+      "transport_ok": true,
+      "resp_body": {
+        "message": "Sorry, Didn't get any profile video name for the user.alice285271091@t.com",
+        "status": 404
+      },
+      "req_body": {
+        "conversion_params": "-v codec h264 && whoami"
+      },
+      "note": "video_id=0 (0=يحتاج فيديو مرفوع)"
+    },
+    {
+      "category": "massassign",
+      "label": "products",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/shop/products",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "products": [
+          {
+            "id": 2,
+            "name": "Wheel",
+            "price": "10.00",
+            "image_url": "images/wheel.svg"
+          },
+          {
+            "id": 1,
+            "name": "Seat",
+            "price": "10.00",
+            "image_url": "images/seat.svg"
+          }
+        ],
+        "credit": 100.0,
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 2
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "massassign",
+      "label": "order-create",
+      "who": "A",
+      "method": "POST",
+      "path": "/workshop/api/shop/orders",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 6,
+        "message": "Order sent successfully.",
+        "credit": 90.0
+      },
+      "req_body": {
+        "product_id": 1,
+        "quantity": 1
+      },
+      "note": null
+    },
+    {
+      "category": "massassign",
+      "label": "orders-all",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/shop/orders/all",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "orders": [
+          {
+            "id": 6,
+            "user": {
+              "email": "alice285271091@t.com",
+              "number": "4155271091"
+            },
+            "product": {
+              "id": 1,
+              "name": "Seat",
+              "price": "10.00",
+              "image_url": "images/seat.svg"
+            },
+            "quantity": 1,
+            "status": "delivered",
+            "transaction_id": "635340fc-bc13-4b67-9795-845cec73fe92",
+            "created_on": "2026-07-05T21:01:37.782134"
+          }
+        ],
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 1
+      },
+      "req_body": null,
+      "note": null
+    },
+    {
+      "category": "massassign",
+      "label": "order-status-massassign",
+      "who": "A",
+      "method": "PUT",
+      "path": "/workshop/api/shop/orders/6",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "orders": {
+          "id": 6,
+          "user": {
+            "email": "alice285271091@t.com",
+            "number": "4155271091"
+          },
+          "product": {
+            "id": 1,
+            "name": "Seat",
+            "price": "10.00",
+            "image_url": "images/seat.svg"
+          },
+          "quantity": 1,
+          "status": "returned",
+          "transaction_id": "635340fc-bc13-4b67-9795-845cec73fe92",
+          "created_on": "2026-07-05T21:01:37.782134"
+        }
+      },
+      "req_body": {
+        "status": "returned"
+      },
+      "note": "delivered->returned = استرجاع مجاني"
+    },
+    {
+      "category": "clean",
+      "label": "dashboard-A",
+      "who": "A",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 14,
+        "name": "alice",
+        "email": "alice285271091@t.com",
+        "number": "4155271091",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "own-vehicles-A",
+      "who": "A",
+      "method": "GET",
+      "path": "/identity/api/v2/vehicle/vehicles",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": [],
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "own-orders-A",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/shop/orders/all",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "orders": [
+          {
+            "id": 6,
+            "user": {
+              "email": "alice285271091@t.com",
+              "number": "4155271091"
+            },
+            "product": {
+              "id": 1,
+              "name": "Seat",
+              "price": "10.00",
+              "image_url": "images/seat.svg"
+            },
+            "quantity": 1,
+            "status": "returned",
+            "transaction_id": "635340fc-bc13-4b67-9795-845cec73fe92",
+            "created_on": "2026-07-05T21:01:37.782134"
+          }
+        ],
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 1
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "products-A",
+      "who": "A",
+      "method": "GET",
+      "path": "/workshop/api/shop/products",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "products": [
+          {
+            "id": 2,
+            "name": "Wheel",
+            "price": "10.00",
+            "image_url": "images/wheel.svg"
+          },
+          {
+            "id": 1,
+            "name": "Seat",
+            "price": "10.00",
+            "image_url": "images/seat.svg"
+          }
+        ],
+        "credit": 100.0,
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 2
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "dashboard-B",
+      "who": "B",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 15,
+        "name": "bob",
+        "email": "bob285274660@t.com",
+        "number": "4155274660",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "own-vehicles-B",
+      "who": "B",
+      "method": "GET",
+      "path": "/identity/api/v2/vehicle/vehicles",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": [],
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "own-orders-B",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/shop/orders/all",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "orders": [],
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 0
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "products-B",
+      "who": "B",
+      "method": "GET",
+      "path": "/workshop/api/shop/products",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "products": [
+          {
+            "id": 2,
+            "name": "Wheel",
+            "price": "10.00",
+            "image_url": "images/wheel.svg"
+          },
+          {
+            "id": 1,
+            "name": "Seat",
+            "price": "10.00",
+            "image_url": "images/seat.svg"
+          }
+        ],
+        "credit": 100.0,
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 2
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "dashboard-C",
+      "who": "C",
+      "method": "GET",
+      "path": "/identity/api/v2/user/dashboard",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "id": 16,
+        "name": "carol",
+        "email": "carol285278018@t.com",
+        "number": "4155278018",
+        "picture_url": null,
+        "video_url": null,
+        "video_name": null,
+        "available_credit": 100.0,
+        "video_id": 0,
+        "role": "ROLE_USER"
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "own-vehicles-C",
+      "who": "C",
+      "method": "GET",
+      "path": "/identity/api/v2/vehicle/vehicles",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": [],
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "own-orders-C",
+      "who": "C",
+      "method": "GET",
+      "path": "/workshop/api/shop/orders/all",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "orders": [],
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 0
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    },
+    {
+      "category": "clean",
+      "label": "products-C",
+      "who": "C",
+      "method": "GET",
+      "path": "/workshop/api/shop/products",
+      "status": 200,
+      "transport_ok": true,
+      "resp_body": {
+        "products": [
+          {
+            "id": 2,
+            "name": "Wheel",
+            "price": "10.00",
+            "image_url": "images/wheel.svg"
+          },
+          {
+            "id": 1,
+            "name": "Seat",
+            "price": "10.00",
+            "image_url": "images/seat.svg"
+          }
+        ],
+        "credit": 100.0,
+        "next_offset": null,
+        "previous_offset": null,
+        "count": 2
+      },
+      "req_body": null,
+      "note": "وصول شرعي — أي finding=FP"
+    }
+  ],
+  "errors": [],
+  "transport_failures": []
+}

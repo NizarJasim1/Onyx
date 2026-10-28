@@ -1,0 +1,92 @@
+{
+  "_derivation": "Each row's label is DERIVED from crAPI's official OpenAPI spec (p0/corpus/crapi-openapi-spec.json, OWASP/crAPI). 'enforces_ownership' is true iff the endpoint defines a 403 'not allowed' response; 'leaks_cross_user' is read from whether the spec's own example payload exposes another principal's data. Independent assessment reports corroborate each (see corpus/PROVENANCE.md).",
+  "spec_source": "https://raw.githubusercontent.com/OWASP/crAPI/refs/heads/develop/openapi-spec/crapi-openapi-spec.json",
+  "endpoints": [
+    {
+      "endpoint": "GET /workshop/api/mechanic/mechanic_report",
+      "effect": "OBJECT_ACCESS",
+      "security": "bearerAuth",
+      "spec_defines_403": false,
+      "spec_example_exposes_other_user": true,
+      "spec_evidence": "response example returns vehicle.owner {email: victim.one@example.com, number}; report_id is int32, sequential; no 403 path defined",
+      "label": "VULN",
+      "challenge": "BOLA-MECHANIC-REPORT"
+    },
+    {
+      "endpoint": "GET /identity/api/v2/vehicle/{vehicleId}/location",
+      "effect": "OBJECT_ACCESS",
+      "security": "bearerAuth",
+      "spec_defines_403": false,
+      "spec_example_exposes_other_user": true,
+      "spec_evidence": "returns {carId, fullName, vehicleLocation}; only 200/404 defined; no ownership-scoped 403; vehicleId is any UUID, leaked via community posts author.vehicleid",
+      "label": "VULN",
+      "challenge": "BOLA-VEHICLE-LOCATION"
+    },
+    {
+      "endpoint": "DELETE /identity/api/v2/admin/videos/{video_id}",
+      "effect": "AUTHORITY",
+      "security": "bearerAuth",
+      "spec_defines_403": true,
+      "spec_example_exposes_other_user": false,
+      "spec_evidence": "admin-only delete; 403 Forbidden defined for non-admin; reaching it as ROLE_USER is the BFLA (function-level)",
+      "label": "VULN",
+      "challenge": "BFLA-ADMIN-DELETE-VIDEO"
+    },
+    {
+      "endpoint": "PUT /workshop/api/shop/orders/{order_id}",
+      "effect": "OWNERSHIP",
+      "security": "bearerAuth",
+      "spec_defines_403": true,
+      "spec_example_exposes_other_user": false,
+      "spec_evidence": "403 'You are not allowed to access this resource!' IS defined -> ownership IS enforced on the order object; the violation is mass-assignment of the client-controlled 'status' (OrderStatusEnum delivered/return pending/returned) to force a refund, not cross-user BOLA",
+      "label": "VULN",
+      "challenge": "BOPLA-ORDER-MASS-ASSIGN-STATUS"
+    },
+    {
+      "endpoint": "GET /community/api/v2/community/posts/recent",
+      "effect": "FIELD_PROJECTION",
+      "security": "bearerAuth",
+      "spec_defines_403": false,
+      "spec_example_exposes_other_user": true,
+      "spec_evidence": "recent-posts example payload exposes each author's vehicleid (UUID) + email of OTHER users (victim.one@example.com, victim.two@example.com) -> excessive data exposure that seeds the vehicle BOLA",
+      "label": "VULN",
+      "challenge": "EDE-COMMUNITY-VEHICLEID-LEAK"
+    },
+    {
+      "endpoint": "GET /identity/api/v2/user/dashboard",
+      "effect": "FIELD_PROJECTION",
+      "security": "bearerAuth",
+      "spec_defines_403": false,
+      "spec_example_exposes_other_user": false,
+      "spec_evidence": "returns ONLY the authenticated user's fields (id,name,email,role,...); independent reports note this endpoint correctly ignores any id param -> 'security done right'",
+      "label": "CLEAN",
+      "challenge": "CLEAN-OWN-DASHBOARD"
+    },
+    {
+      "endpoint": "GET /workshop/api/shop/orders/{order_id}",
+      "effect": "OBJECT_ACCESS",
+      "security": "bearerAuth",
+      "spec_defines_403": true,
+      "spec_example_exposes_other_user": false,
+      "spec_evidence": "GET order defines 403 'not allowed' -> reading your OWN order is the legitimate, ownership-checked path (a clean 200 a heuristic would still flag)",
+      "label": "CLEAN",
+      "challenge": "CLEAN-OWN-ORDER-READ"
+    },
+    {
+      "endpoint": "GET /identity/api/v2/vehicle/vehicles",
+      "effect": "OBJECT_ACCESS",
+      "security": "bearerAuth",
+      "spec_defines_403": false,
+      "spec_example_exposes_other_user": false,
+      "spec_evidence": "returns the caller's OWN vehicles array (owner is the authenticated User) -> legitimate self-listing",
+      "label": "CLEAN",
+      "challenge": "CLEAN-OWN-VEHICLES"
+    }
+  ],
+  "ceded_in_spec_but_out_of_scope": [
+    "POST /workshop/api/merchant/contact_mechanic (SSRF via mechanic_api / L7 DoS via number_of_repeats)",
+    "POST /community/api/v2/coupon/validate-coupon (NoSQL injection)",
+    "POST /identity/api/auth/v2/check-otp (OTP brute force / rate-limit bypass)",
+    "JWT forge (no endpoint; signature/crypto)"
+  ]
+}

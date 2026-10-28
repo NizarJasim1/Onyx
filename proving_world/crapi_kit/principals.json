@@ -1,0 +1,5 @@
+{
+  "A": {"Authorization": "Bearer <PASTE user A JWT>"},
+  "B": {"Authorization": "Bearer <PASTE user B JWT>"},
+  "C": {"Authorization": "Bearer <PASTE user C JWT>"}
+}

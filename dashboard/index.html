@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ONYX</title>
+<style>
+:root{
+  --bg:#050507;--bg2:#0a0809;--pane:#0d0a0b;--pane2:#120d0e;
+  --line:#241a1c;--line2:#3a282b;
+  --ink:#ece2e2;--dim:#8a767a;--dim2:#564448;
+  --red:#ff2236;--red-d:#7a0010;--red-l:#ff5e6e;--ember:#ff8a2b;--amber:#f5b53d;--cy:#39d0c8;--green:#43c98a;
+  --mono:"SF Mono","JetBrains Mono","Roboto Mono",ui-monospace,Menlo,Consolas,monospace;
+  --disp:"Arial Narrow","Helvetica Neue Condensed",Oswald,Impact,system-ui,sans-serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:12.5px}
+.df{font-family:var(--disp)}
+#mx,#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+#vig,#scan{position:fixed;inset:0;pointer-events:none;z-index:80}
+#vig{background:radial-gradient(120% 110% at 50% 25%,transparent 55%,rgba(0,0,0,.62) 100%),radial-gradient(70% 50% at 78% -5%,rgba(255,34,54,.07),transparent 60%)}
+#scan{background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);mix-blend-mode:overlay;opacity:.5}
+.flash{position:fixed;inset:0;z-index:82;pointer-events:none;box-shadow:inset 0 0 150px rgba(255,34,54,0);transition:box-shadow .12s}
+.flash.hit{box-shadow:inset 0 0 180px rgba(255,34,54,.5)}
+.tear{position:fixed;left:0;right:0;height:1px;background:var(--red);z-index:83;pointer-events:none;opacity:0;mix-blend-mode:screen}
+
+.app{position:relative;z-index:1;display:grid;height:100vh;gap:8px;padding:8px;
+  grid-template-columns:236px 1fr 326px;grid-template-rows:54px 1fr 70px;
+  grid-template-areas:"top top top" "left stage right" "bottom bottom bottom"}
+.panel{background:linear-gradient(180deg,rgba(18,13,14,.92),rgba(10,8,9,.94));border:1px solid var(--line);position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;top:0;left:0;width:9px;height:9px;border-top:1px solid var(--red);border-left:1px solid var(--red);opacity:.6;z-index:2}
+.panel::after{content:"";position:absolute;bottom:0;right:0;width:9px;height:9px;border-bottom:1px solid var(--red);border-right:1px solid var(--red);opacity:.6;z-index:2}
+.ph{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;user-select:none}
+.ph .dot{width:6px;height:6px;background:var(--red);box-shadow:0 0 7px var(--red);animation:blink 1.5s infinite}
+.ph .x{margin-left:auto;color:var(--ink);font-size:11px;letter-spacing:0}
+.ph .pop{margin-left:8px;width:19px;height:16px;line-height:13px;text-align:center;background:none;border:1px solid var(--line2);color:var(--dim);cursor:pointer;font-size:11px;flex:none}
+.ph .pop:hover{color:var(--red);border-color:var(--red)}
+.ph .x + .pop{margin-left:8px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.panel.floating{position:fixed!important;z-index:200;box-shadow:0 22px 70px rgba(0,0,0,.75),0 0 0 1px var(--red-d),0 0 30px rgba(255,34,54,.15);min-width:220px;min-height:130px;animation:popin .18s ease both}
+@keyframes popin{from{transform:scale(.96);opacity:.4}to{transform:scale(1);opacity:1}}
+.panel.floating>.ph{cursor:move;background:linear-gradient(90deg,rgba(255,34,54,.12),transparent)}
+.rz{position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;z-index:5;background:linear-gradient(135deg,transparent 45%,var(--red) 45%,var(--red) 55%,transparent 55%,transparent 70%,var(--red) 70%,var(--red) 80%,transparent 80%)}
+
+.top{grid-area:top;display:flex;align-items:center;gap:18px;padding:0 14px;background:linear-gradient(180deg,#140d0e,#0a0708);border:1px solid var(--line)}
+.wm{display:flex;align-items:baseline;gap:10px}
+.wm .lk{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:4px;line-height:1}.wm .lk b{color:var(--red)}
+.wm .tag{font-size:8.5px;color:var(--dim);letter-spacing:2.5px}
+.tele{display:flex;gap:16px;font-size:10px;color:var(--dim2)}.tele b{color:var(--dim);font-weight:500}.tele em{color:var(--ink);font-style:normal}
+.statpill{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--dim);border:1px solid var(--line2);padding:5px 11px;letter-spacing:1px;background:linear-gradient(90deg,rgba(255,34,54,.06),transparent)}
+.led{width:7px;height:7px;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.6s infinite}
+.top .r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.gauge{display:flex;align-items:center;gap:9px}.gauge .gt{font-size:9px;color:var(--dim);line-height:1.5}.gauge .gt b{color:var(--ink);font-size:12px}
+.run{font-family:var(--disp);font-weight:800;letter-spacing:3px;font-size:14px;cursor:pointer;color:#1a0406;background:linear-gradient(180deg,#ff3145,#b80016);border:1px solid #ff6373;padding:10px 20px 10px 30px;position:relative;text-transform:uppercase;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);box-shadow:0 0 20px rgba(255,34,54,.35);transition:.14s}
+.run::after{content:"▸";position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px}
+.run:hover{box-shadow:0 0 30px rgba(255,34,54,.6)}.run:active{transform:translateY(1px)}.run[disabled]{opacity:.45;cursor:wait}
+
+.left{grid-area:left;display:flex;flex-direction:column;gap:8px;min-height:0}
+.left .panel{flex:0 0 auto}.left .panel.grow{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+.modeset{display:flex;border:1px solid var(--line2)}
+.mtab{flex:1;text-align:center;font-size:9.5px;letter-spacing:1px;padding:7px 2px;cursor:pointer;color:var(--dim);border-right:1px solid var(--line2);transition:.12s}
+.mtab:last-child{border-right:none}.mtab:hover{color:var(--ink)}.mtab.on{background:var(--red);color:#1a0406;font-weight:700}
+.spk{width:100%;height:46px;display:block}
+.bars{padding:8px 10px;display:flex;flex-direction:column;gap:6px;overflow:auto}
+.bar{font-size:10px}.bar .bl{display:flex;justify-content:space-between;color:var(--dim);margin-bottom:2px}.bar .bl b{color:var(--ink)}
+.bar .bt{height:6px;background:var(--line);position:relative;overflow:hidden}.bar .bf{position:absolute;left:0;top:0;height:100%;width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.bar.A .bf{background:#5fb0e6}.bar.B .bf{background:var(--ember)}.bar.anon .bf{background:var(--dim)}.bar.eff .bf{background:linear-gradient(90deg,var(--red-d),var(--red))}
+
+.stage{grid-area:stage;padding:0}
+.view{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .22s}.view.on{opacity:1;pointer-events:auto}
+.fig{position:absolute;top:10px;left:14px;z-index:6;font-size:10px;letter-spacing:2px;color:var(--dim)}.fig b{color:var(--red)}.fig.glitching{animation:glitch .35s steps(2) 1}
+@keyframes glitch{0%{text-shadow:2px 0 var(--red),-2px 0 var(--cy)}50%{text-shadow:-2px 0 var(--red),2px 0 var(--cy);transform:translateX(2px)}100%{text-shadow:none;transform:none}}
+.legend{position:absolute;top:10px;right:14px;z-index:6;display:flex;gap:13px;font-size:9px;color:var(--dim)}.legend i{display:inline-block;width:16px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+.coord{position:absolute;left:14px;bottom:28px;z-index:6;font-size:9.5px;color:var(--dim2);letter-spacing:1px}.coord b{color:var(--red-l)}
+#cv{display:block;width:100%;height:100%}
+.sweep{position:absolute;left:50%;top:50%;width:130vh;height:130vh;transform:translate(-50%,-50%);background:conic-gradient(from 0deg,rgba(255,34,54,.12),transparent 22%);animation:sweep 6s linear infinite;mix-blend-mode:screen;pointer-events:none}
+@keyframes sweep{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.tip{position:absolute;z-index:20;background:#140d0e;border:1px solid var(--line2);padding:5px 9px;font-size:10px;pointer-events:none;opacity:0;transition:.1s;white-space:nowrap}.tip b{color:var(--red-l)}
+.ticker{position:absolute;left:0;right:0;bottom:0;height:20px;overflow:hidden;z-index:5;border-top:1px solid var(--line);background:rgba(7,5,6,.85);display:flex;align-items:center}
+.tk{display:inline-block;white-space:nowrap;font-size:9px;color:var(--dim2);animation:marq 26s linear infinite;will-change:transform}.tk em{color:var(--red);font-style:normal}.tk .g{color:var(--green)}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+#stream{position:absolute;inset:0;overflow:auto;padding:38px 14px 28px}
+.contact{display:grid;grid-template-columns:26px 52px 1fr auto;gap:11px;align-items:center;padding:8px 11px;border-bottom:1px solid var(--line);cursor:pointer;opacity:.32;transition:.16s}
+.contact.shown{opacity:1}.contact:hover{background:rgba(255,255,255,.025)}.contact.sel{background:rgba(255,34,54,.07);box-shadow:inset 3px 0 0 var(--red)}
+.contact .ix{font-size:9.5px;color:var(--dim2)}
+.who{font-weight:700;font-size:10.5px;text-align:center;padding:3px;border:1px solid var(--line2)}.who.A{color:#5fb0e6}.who.B{color:var(--ember)}.who.anon{color:var(--dim)}
+.contact .m{font-size:12px}.contact .d{font-size:10.5px;color:var(--dim);margin-top:1px;font-family:var(--sans)}
+.stamp{font-family:var(--disp);font-weight:800;letter-spacing:2px;font-size:12px;padding:4px 10px;border:2px solid;transform:rotate(-2.5deg);text-transform:uppercase}
+.stamp.finding{color:var(--red);border-color:var(--red);box-shadow:0 0 11px rgba(255,34,54,.4)}.stamp.dropped{color:var(--amber);border-color:var(--amber)}.stamp.clean{color:var(--green);border-color:var(--green)}.stamp.halt{color:var(--dim);border-color:var(--dim);border-style:dashed}
+.stamp.pending{color:var(--dim2);border-color:var(--line2);transform:none;font-family:var(--mono);font-weight:400;letter-spacing:0;border-width:1px;animation:blink 1s infinite}
+
+#proof{position:absolute;inset:0;overflow:auto;padding:38px 18px 18px}
+.pempty{font-size:11px;color:var(--dim2);margin-top:46px;text-align:center;letter-spacing:1px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.phd{grid-column:1/-1;border-left:3px solid var(--red);padding:6px 0 6px 13px}.phd .pt{font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:.5px}
+.phd .pm{font-size:10px;color:var(--dim);margin-top:3px;display:flex;gap:13px;flex-wrap:wrap}.phd .pm b{color:var(--red)}
+.blk{border:1px solid var(--line)}.blk .bh{font-size:9.5px;letter-spacing:2px;color:var(--dim);padding:6px 10px;border-bottom:1px solid var(--line);text-transform:uppercase;background:rgba(255,34,54,.04)}.blk .bc{padding:10px}
+.diff{font-size:11.5px;line-height:1.7}.diff .ln{display:flex;gap:8px;padding:3px 7px}.diff .before{background:rgba(255,34,54,.07);border-left:2px solid var(--red)}.diff .after{background:rgba(67,201,138,.08);border-left:2px solid var(--green)}.diff .sign{width:12px}.diff .before .sign{color:var(--red)}.diff .after .sign{color:var(--green)}
+.chain{list-style:none;counter-reset:k}.chain li{position:relative;padding:5px 0 12px 26px;font-size:11.5px;line-height:1.5;font-family:var(--sans)}
+.chain li::before{counter-increment:k;content:counter(k,decimal-leading-zero);position:absolute;left:0;top:3px;width:18px;height:17px;background:rgba(255,34,54,.08);border:1px solid var(--red-d);color:var(--red);font-family:var(--mono);font-size:8.5px;display:grid;place-items:center}
+.chain li::after{content:"";position:absolute;left:8px;top:22px;bottom:0;width:1px;background:var(--line2)}.chain li:last-child::after{display:none}
+.pocbox{position:relative}.pocbox pre{font-size:11px;background:#070405;border:1px solid var(--line);padding:10px;overflow:auto;color:#e0b3b8}
+.pbtn{font-size:9.5px;color:var(--dim);background:#140d0e;border:1px solid var(--line2);padding:5px 10px;cursor:pointer;letter-spacing:1px}.pbtn:hover{color:var(--red);border-color:var(--red)}.pocbtns{display:flex;gap:7px;position:absolute;top:7px;right:7px}
+
+.right{grid-area:right;display:flex;flex-direction:column;gap:8px;min-height:0}
+.right .triage{flex:1 1 60%;display:flex;flex-direction:column;min-height:0}.right .c2{flex:1 1 40%;display:flex;flex-direction:column;min-height:0}
+.sevrow{display:flex;gap:5px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--line);min-height:30px}
+.sv{font-size:9px;padding:2px 7px;border:1px solid var(--line2)}.sv.c{color:var(--red);border-color:var(--red-d)}.sv.h{color:var(--ember)}.sv.m{color:var(--amber)}.sv.l{color:#5fb0e6}
+.tlist{flex:1;overflow:auto;padding:8px}
+.trow{border-left:2px solid var(--line2);padding:7px 9px;margin-bottom:6px;cursor:pointer;background:rgba(255,255,255,.012);transition:.13s;animation:drop .3s both}
+@keyframes drop{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.trow:hover{background:rgba(255,255,255,.04)}.trow.sel{border-left-color:var(--red);background:rgba(255,34,54,.06)}
+.trow.Critical{border-left-color:var(--red)}.trow.High{border-left-color:var(--ember)}.trow.Medium{border-left-color:var(--amber)}.trow.Low{border-left-color:var(--dim)}
+.trow .rt{font-family:var(--sans);font-size:11.5px;font-weight:600;line-height:1.25}.trow .rm{font-size:9px;color:var(--dim);margin-top:3px;display:flex;justify-content:space-between}
+.trow .rf{font-size:9.5px;margin-top:4px;color:var(--ink)}.trow .rf .a{color:var(--ember)}.trow .rf .o{color:#5fb0e6}.trow .rf .ar{color:var(--red)}
+.tempty{font-size:10.5px;color:var(--dim2);line-height:1.9;padding:12px 4px}
+.c2log{flex:1;overflow:auto;padding:7px 10px;font-size:10px;line-height:1.55}.c2log .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c2log .t{color:var(--dim2)}.c2log .ok{color:var(--green)}.c2log .wrn{color:var(--amber)}.c2log .err{color:var(--red)}.c2log .inf{color:var(--dim)}.c2log .hi{color:var(--ink)}
+
+.bottom{grid-area:bottom;display:flex;align-items:center;gap:16px;padding:0 16px}
+.rlabel{font-family:var(--disp);font-weight:800;letter-spacing:3px;font-size:11px;color:var(--dim)}
+.track{flex:1;height:42px;position:relative}.dim{position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line2)}
+.tick{position:absolute;top:50%;width:11px;height:11px;transform:translate(-50%,-50%) rotate(45deg);border:1.4px solid var(--dim2);background:var(--bg);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.tick:hover{border-color:var(--ink)}.tick.finding{border-color:var(--red);background:var(--red);box-shadow:0 0 9px var(--red)}.tick.dropped{border-color:var(--amber)}.tick.clean{border-color:var(--green)}.tick.cur{box-shadow:0 0 0 3px rgba(255,34,54,.3)}
+.station{position:absolute;top:calc(50% + 11px);transform:translateX(-50%);font-size:7.5px;color:var(--dim2)}
+.playhead{position:absolute;top:3px;bottom:3px;width:1px;background:var(--red);box-shadow:0 0 8px var(--red);left:0;transition:left .3s;pointer-events:none}.playhead::before{content:"";position:absolute;top:-2px;left:-4px;border:4px solid transparent;border-top-color:var(--red)}
+.speedctl{display:flex;align-items:center;gap:7px;font-size:9.5px;color:var(--dim)}.speedctl input{width:80px;accent-color:var(--red)}
+.now{font-size:9.5px;color:var(--dim);min-width:160px;text-align:right}
+::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-thumb{background:var(--line2)}::-webkit-scrollbar-track{background:transparent}
+.idle{position:absolute;left:0;right:0;bottom:24px;z-index:7;display:flex;justify-content:center;pointer-events:none}
+.idle .hint{font-size:10.5px;color:var(--dim);letter-spacing:1px;background:rgba(7,5,6,.6);padding:5px 12px;border:1px solid var(--line)}.idle .hint b{color:var(--red)}
+.dockall{position:fixed;right:14px;bottom:84px;z-index:210;display:none;font-size:9.5px;letter-spacing:1px;color:var(--dim);background:#140d0e;border:1px solid var(--line2);padding:6px 11px;cursor:pointer}
+.dockall:hover{color:var(--red);border-color:var(--red)}
+
+/* ---- DIAGNOSTICS tab ---- */
+.dgtools{display:flex;justify-content:flex-end;margin-bottom:10px}
+.dgx{font-family:var(--disp);font-weight:800;letter-spacing:2px;font-size:10px;color:#1a0406;background:linear-gradient(180deg,#ff3145,#b80016);border:1px solid #ff6373;padding:6px 12px;cursor:pointer;text-transform:uppercase;clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);transition:.13s}
+.dgx:hover{filter:brightness(1.15);box-shadow:0 0 14px rgba(255,34,54,.4)}
+#diag{padding:14px 16px 26px;overflow:auto;height:100%}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:9px;margin-bottom:14px}
+.dcard{border:1px solid var(--line);background:linear-gradient(180deg,var(--pane2),#0b0809);padding:11px 12px;position:relative;overflow:hidden}
+.dcard::after{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:var(--red-d)}
+.dcard.good::after{background:var(--green)}.dcard.warn::after{background:var(--amber)}.dcard.key::after{background:var(--red)}
+.dcard .dl{font-size:8.5px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.dcard .dn{font-family:var(--disp);font-weight:800;font-size:30px;line-height:1.05;margin-top:5px;color:var(--ink)}
+.dcard.good .dn{color:var(--green)}.dcard.key .dn{color:var(--red-l)}.dcard.warn .dn{color:var(--amber)}
+.dcard .ds{font-size:9px;color:var(--dim);margin-top:2px;font-family:var(--mono)}
+.dsec{margin:16px 0 7px;font-family:var(--disp);font-weight:800;letter-spacing:3px;font-size:12px;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:5px}
+.dsec b{color:var(--red)}
+.dtbl{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)}
+.dtbl th{text-align:left;color:var(--dim);font-weight:400;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--line2);background:rgba(255,34,54,.04)}
+.dtbl td{padding:5px 8px;border-bottom:1px solid var(--line);color:var(--ink)}
+.dtbl tr:hover td{background:rgba(255,255,255,.02)}
+.dbar{height:6px;background:#1a1012;border:1px solid var(--line);position:relative;min-width:44px}
+.dbar i{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--red-d),var(--red))}
+.dbar.g i{background:linear-gradient(90deg,#1c6b48,var(--green))}
+.pill{font-size:9px;padding:1px 6px;border:1px solid var(--line2);font-family:var(--mono)}
+.pill.c{color:var(--red);border-color:var(--red-d)}.pill.h{color:var(--ember)}.pill.m{color:var(--amber)}.pill.l{color:#5fb0e6}
+.dgsrc{font-size:8.5px;color:var(--dim2);font-family:var(--mono);margin-top:14px;letter-spacing:.5px}
+
+/* ===== ENGAGEMENT DRAWER (live target config) ===== */
+.eng-scrim{position:fixed;inset:0;background:rgba(3,3,5,.62);backdrop-filter:blur(2px);z-index:300;opacity:0;pointer-events:none;transition:opacity .18s}
+.eng-scrim.on{opacity:1;pointer-events:auto}
+.eng{position:fixed;top:0;right:0;height:100%;width:min(468px,94vw);z-index:301;transform:translateX(102%);transition:transform .22s cubic-bezier(.4,0,.2,1);background:linear-gradient(200deg,#120d0e,#0a0809 60%);border-left:1px solid var(--line2);box-shadow:-24px 0 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
+.eng.on{transform:translateX(0)}
+.eng-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(255,34,54,.10),transparent)}
+.eng-hd .lk{font-family:var(--disp);font-weight:800;letter-spacing:2px;font-size:15px;color:var(--ink)}
+.eng-hd .sub{font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+.eng-x{margin-left:auto;font-size:15px;color:var(--dim);background:none;border:1px solid var(--line2);width:26px;height:26px;cursor:pointer;line-height:1}
+.eng-x:hover{color:var(--red);border-color:var(--red)}
+.eng-body{overflow-y:auto;padding:6px 16px 16px;flex:1}
+.eng-body::-webkit-scrollbar{width:8px}.eng-body::-webkit-scrollbar-thumb{background:var(--line2)}
+.eng-sec{margin-top:16px}
+.eng-sec>.lbl{font-size:9.5px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.eng-sec>.lbl::before{content:"";width:5px;height:5px;background:var(--red);box-shadow:0 0 6px var(--red)}
+.eng label.fl{display:block;font-size:9px;letter-spacing:1px;color:var(--dim2);text-transform:uppercase;margin:0 0 3px 1px}
+.eng input[type=text],.eng input[type=url]{width:100%;background:#0d0a0b;border:1px solid var(--line2);color:var(--ink);font-family:var(--mono);font-size:12px;padding:8px 9px;outline:none}
+.eng input:focus{border-color:var(--red);box-shadow:0 0 0 1px rgba(255,34,54,.25)}
+.eng input::placeholder{color:#4a3a3d}
+.eng .row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.eng .row .pid{flex:0 0 62px}
+.eng .row .meth{flex:0 0 82px;background:#0d0a0b;border:1px solid var(--line2);color:var(--ink);font-family:var(--mono);font-size:11px;padding:8px 6px}
+.eng .row .grow{flex:1;min-width:0}
+.eng .rm{flex:0 0 auto;background:#140d0e;border:1px solid var(--line2);color:var(--dim);width:30px;height:34px;cursor:pointer;font-size:14px;line-height:1}
+.eng .rm:hover{color:var(--red);border-color:var(--red)}
+.eng .add{font-size:9.5px;letter-spacing:1px;color:var(--dim);background:#140d0e;border:1px dashed var(--line2);padding:6px 10px;cursor:pointer;text-transform:uppercase}
+.eng .add:hover{color:var(--cy);border-color:var(--cy)}
+.eng .ep{border:1px solid var(--line);padding:8px;margin-bottom:8px;background:rgba(13,10,11,.5)}
+.eng .ep .idrow{margin:5px 0 0 0}
+.eng .hint{font-size:9px;color:var(--dim2);line-height:1.5;margin-top:4px}
+.eng .aff{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line2);padding:10px;background:rgba(255,34,54,.05);margin-top:4px}
+.eng .aff input{margin-top:2px;accent-color:var(--red);flex:0 0 auto;width:15px;height:15px}
+.eng .aff .t{font-size:10.5px;color:var(--ink);line-height:1.45}
+.eng .aff .t b{color:var(--red)}
+.eng .toggle{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--dim);cursor:pointer;user-select:none}
+.eng .toggle input{accent-color:var(--cy);width:15px;height:15px}
+.eng-ft{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;background:#0a0809}
+.eng-ft .save{font-size:10px;letter-spacing:1px;color:var(--dim);background:#140d0e;border:1px solid var(--line2);padding:9px 13px;cursor:pointer;text-transform:uppercase}
+.eng-ft .save:hover{color:var(--ink);border-color:var(--dim)}
+.eng-ft .go{margin-left:auto;font-family:var(--disp);font-weight:800;letter-spacing:2px;font-size:13px;color:#1a0406;background:linear-gradient(180deg,#ff3145,#b80016);border:1px solid #ff6373;padding:10px 20px;cursor:pointer;text-transform:uppercase;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.eng-ft .go:disabled{filter:grayscale(.7) brightness(.6);cursor:not-allowed}
+.eng-ft .go:not(:disabled):hover{box-shadow:0 0 18px rgba(255,34,54,.5)}
+/* header target button + run-mode segmented control */
+.tgtbtn{font-size:10px;letter-spacing:1.5px;color:var(--dim);background:#140d0e;border:1px solid var(--line2);padding:8px 12px;cursor:pointer;text-transform:uppercase;font-family:var(--disp);font-weight:700}
+.tgtbtn:hover{color:var(--red);border-color:var(--red)}
+.tgtbtn.armed{color:var(--red);border-color:var(--red-d);background:linear-gradient(90deg,rgba(255,34,54,.14),#140d0e)}
+.modepick{display:flex;border:1px solid var(--line2)}
+.modepick .mp{font-size:9px;letter-spacing:1px;padding:6px 9px;cursor:pointer;color:var(--dim);border-right:1px solid var(--line2);text-transform:uppercase;font-family:var(--disp);font-weight:700}
+.modepick .mp:last-child{border-right:0}
+.modepick .mp.on{color:var(--ink);background:rgba(255,34,54,.16)}
+.tpk{font-size:9px;color:var(--dim);background:#140d0e;border:1px solid var(--line2);padding:4px 8px;cursor:pointer;letter-spacing:1px}
+.tpk:hover{color:var(--green);border-color:var(--green)}
+/* new engagement controls */
+.eng .mono{font-family:var(--mono)}
+.eng select{background:#0d0a0b;border:1px solid var(--line2);color:var(--ink);font-family:var(--mono);font-size:11px;padding:7px 6px;outline:none;cursor:pointer}
+.eng select:focus{border-color:var(--red)}
+.eng textarea{width:100%;background:#0d0a0b;border:1px solid var(--line2);color:var(--ink);font-family:var(--mono);font-size:11px;line-height:1.5;padding:8px 9px;outline:none;resize:vertical;min-height:54px}
+.eng textarea:focus{border-color:var(--red);box-shadow:0 0 0 1px rgba(255,34,54,.25)}
+.eng textarea::placeholder{color:#4a3a3d}
+.curlbox{border:1px solid var(--line2);background:rgba(57,208,200,.05);padding:10px;margin-top:12px}
+.curlbox .lbl{font-size:9.5px;letter-spacing:1.5px;color:var(--cy);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.curlbox .lbl::before{content:"";width:5px;height:5px;background:var(--cy);box-shadow:0 0 6px var(--cy)}
+.eng .ep .effrow{display:flex;gap:6px;align-items:center;margin-top:6px}
+.eng .ep .effrow .efflabel{font-size:8.5px;letter-spacing:1px;color:var(--dim2);text-transform:uppercase}
+.eng .ep .eff{flex:0 0 auto}
+.eng .ep .bodytog{font-size:9px;letter-spacing:1px;color:var(--dim);background:#140d0e;border:1px solid var(--line2);padding:5px 9px;cursor:pointer;text-transform:uppercase;margin-left:auto}
+.eng .ep .bodytog.on{color:var(--amber);border-color:var(--amber)}
+.eng .ep .bodywrap{margin-top:6px}
+.eng .row .atype{flex:0 0 78px;background:#0d0a0b;border:1px solid var(--line2);color:var(--dim);font-family:var(--mono);font-size:10px;padding:8px 4px;cursor:pointer}
+.eng .row .hname{flex:0 0 96px}
+.pingout{margin:8px 0 2px}
+.pingrow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;padding:4px 8px;border:1px solid var(--line);margin-bottom:4px;background:rgba(13,10,11,.6)}
+.pingrow .pd{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.pingrow.ok .pd{background:var(--green);box-shadow:0 0 6px var(--green)}
+.pingrow.bad .pd{background:var(--red);box-shadow:0 0 6px var(--red)}
+.pingrow .pp{color:var(--ink);flex:0 0 44px}
+.pingrow .ps{color:var(--dim)}
+.pingrow .pm{margin-left:auto;color:var(--dim2)}
+/* severity filter chips */
+.sevfilter{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid var(--line)}
+.sevfilter .sf{font-size:8.5px;letter-spacing:.5px;padding:3px 7px;border:1px solid var(--line2);color:var(--dim);cursor:pointer;font-family:var(--mono);text-transform:uppercase}
+.sevfilter .sf.on{color:var(--ink);background:rgba(255,34,54,.14);border-color:var(--red-d)}
+.sevfilter .sf:hover{color:var(--ink)}
+#tlist[data-sev="Critical"] .trow:not(.Critical),
+#tlist[data-sev="High"] .trow:not(.High),
+#tlist[data-sev="Medium"] .trow:not(.Medium),
+#tlist[data-sev="Low"] .trow:not(.Low){display:none}
+
+</style>
+</head>
+<body>
+<canvas id="mx"></canvas><canvas id="bg"></canvas>
+<div id="vig"></div><div id="scan"></div><div class="flash" id="flash"></div><div class="tear" id="tear"></div>
+<button class="dockall" id="dockall">⤡ DOCK ALL</button>
+
+<div class="eng-scrim" id="engScrim"></div>
+<aside class="eng" id="eng" aria-hidden="true">
+  <div class="eng-hd">
+    <div><div class="lk">ENGAGEMENT</div><div class="sub" id="engHost">no target set</div></div>
+    <button class="tpk" id="engCurl" title="paste a cURL command to autofill">⎘ cURL</button>
+    <button class="eng-x" id="engClose" title="close">✕</button>
+  </div>
+  <div class="eng-body">
+
+    <div class="curlbox" id="curlBox" style="display:none">
+      <div class="lbl">Import from cURL</div>
+      <textarea id="curlIn" spellcheck="false" placeholder="curl 'https://api.target.com/orders/1001' -H 'authorization: Bearer eyJ…'"></textarea>
+      <div class="row" style="margin-top:6px">
+        <button class="add" id="curlDo">Parse &amp; fill</button>
+        <button class="add" id="curlCancel">Cancel</button>
+      </div>
+      <div class="hint">Sets the base URL, adds this endpoint, and captures the auth header as a new principal.</div>
+    </div>
+
+    <div class="eng-sec">
+      <div class="lbl">Target</div>
+      <input type="url" id="fBase" placeholder="https://api.target.com" autocomplete="off" spellcheck="false">
+      <div class="row" style="margin-top:6px">
+        <div class="grow"><input type="text" id="fProgram" placeholder="program name (shown on reports)" autocomplete="off"></div>
+        <div class="grow"><input type="text" id="fResearcher" placeholder="researcher handle" autocomplete="off"></div>
+      </div>
+    </div>
+
+    <div class="eng-sec">
+      <div class="lbl">Principals</div>
+      <div id="prinRows"></div>
+      <div class="row" style="margin-top:2px"><button class="add" id="addPrin">＋ principal</button><button class="add" id="engPing" title="one read-only request per principal to verify the credential reaches the target">⚡ test credentials</button></div>
+      <div id="pingOut" class="pingout"></div>
+      <div class="hint">Two accounts in separate tenants prove cross-account access. Credential type per account: Bearer, Cookie, or a custom header.</div>
+    </div>
+
+    <div class="eng-sec">
+      <div class="lbl">Endpoints</div>
+      <div id="epRows"></div>
+      <button class="add" id="addEp">＋ endpoint</button>
+      <div class="hint"><span class="mono">{id}</span> is the object-id slot. Tag an effect and the money/logic laws classify it; leave <span class="mono">auto</span> for pure IDOR/BOLA. Add a JSON body for payment, price, and mass-assignment probes.</div>
+    </div>
+
+    <div class="eng-sec">
+      <div class="lbl">Writable ids</div>
+      <input type="text" id="fTestRes" placeholder="1001, 2002  —  only ids you own, required before any mutating probe" autocomplete="off">
+    </div>
+
+    <div class="eng-sec">
+      <label class="toggle"><input type="checkbox" id="fDry" checked> Dry-run — never commit a mutating confirmation</label>
+      <label class="toggle" style="margin-top:7px"><input type="checkbox" id="fSaveTokens"> Remember credentials in this browser</label>
+    </div>
+
+    <div class="eng-sec">
+      <div class="aff">
+        <input type="checkbox" id="fAuth">
+        <div class="t">I am <b>authorized</b> to test this target, every id is <b>in scope</b> and owned by my accounts, and I am acting within the program's rules &amp; safe-harbor.</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="eng-ft">
+    <button class="save" id="engSave">Save</button>
+    <span id="engMsg"></span>
+    <button class="go" id="engRun" disabled>▶ Live sweep</button>
+  </div>
+</aside>
+
+<div class="app">
+  <header class="top">
+    <div class="wm"><div class="lk df">ONY<b>X</b></div><div class="tag">AUTHZ<br>PROVENANCE</div></div>
+    <div class="statpill"><span class="led"></span><span id="statusTxt">STANDBY · SCOPE LOCKED</span></div>
+    <div class="tele"><span><b>SES</b> <em id="tSes">0x0000</em></span><span><b>PKT</b> <em id="tPkt">0000</em></span><span><b>REQ/S</b> <em id="tRps">0.0</em></span><span><b>UTC</b> <em id="tClk">--:--:--</em></span></div>
+    <div class="r">
+      <div class="gauge"><svg width="40" height="40" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#241a1c" stroke-width="4"/><circle id="gaugeArc" cx="22" cy="22" r="18" fill="none" stroke="#ff2236" stroke-width="4" stroke-dasharray="113" stroke-dashoffset="113" transform="rotate(-90 22 22)"/><text id="gaugeNum" x="22" y="26" text-anchor="middle" fill="#ece2e2" font-size="11">—</text></svg>
+        <div class="gt"><b id="gNum">—</b> PRECISION<br><span id="gSub">standby</span></div></div>
+      <div class="modepick" id="modepick" title="DEMO replays the labelled built-in scenario · LIVE drives an authorized target you configure">
+        <div class="mp on" data-mode="demo">DEMO</div><div class="mp" data-mode="live">LIVE</div>
+      </div>
+      <button class="tgtbtn" id="tgtbtn" title="configure the authorized target (base URL, test accounts, endpoints, scope)">⌖ TARGET</button>
+      <button class="run" id="run">INITIATE</button>
+    </div>
+  </header>
+
+  <aside class="left">
+    <div class="panel"><div class="ph"><span class="dot"></span>MODE</div><div class="modeset"><div class="mtab on" data-view="lattice">LATTICE</div><div class="mtab" data-view="stream">STREAM</div><div class="mtab" data-view="proof">Δ-PROOF</div><div class="mtab" data-view="diag">DIAG</div></div></div>
+    <div class="panel"><div class="ph"><span class="dot"></span>THROUGHPUT<span class="x" id="thruNum">0.0/s</span></div><canvas class="spk" id="spk"></canvas></div>
+    <div class="panel grow"><div class="ph"><span class="dot"></span>LAW ACTIVITY<span class="x" id="lawHit">0</span></div><div class="bars" id="barsEff"></div></div>
+    <div class="panel"><div class="ph"><span class="dot"></span>PRINCIPAL LOAD</div><div class="bars" id="barsPrin"></div></div>
+  </aside>
+
+  <main class="stage panel">
+    <section class="view on" id="v-lattice">
+      <div class="fig" id="figLat">FIG.01 — AUTHORITY <b>LATTICE</b></div>
+      <div class="legend"><span><i style="border-color:#564448"></i>granted</span><span><i style="border-color:#ff2236"></i>laundered</span></div>
+      <div class="sweep" id="sweep" style="display:none"></div>
+      <canvas id="cv"></canvas><div class="tip" id="tip"></div><div class="coord" id="coord">E--- N---</div>
+      <div class="idle" id="idle"><div class="hint">SYSTEM NOMINAL · press <b>INITIATE</b> or SPACE to sweep · pop-out panels with ⤢</div></div>
+      <div class="ticker"><span class="tk" id="tickStrip"></span></div>
+    </section>
+    <section class="view" id="v-stream"><div class="fig">FIG.02 — REPLAY <b>STREAM</b></div><div id="stream"></div></section>
+    <section class="view" id="v-proof"><div class="fig">FIG.03 — Δ-STATE <b>PROOF</b></div><div id="proof"><div class="pempty">// select a confirmed contact</div></div></section>
+    <section class="view" id="v-diag" style="position:relative"><div class="fig">FIG.04 — SYSTEM <b>DIAGNOSTICS</b></div><div id="diag"><div class="pempty">// computing diagnostics…</div></div></section>
+  </main>
+
+  <aside class="right">
+    <div class="panel triage"><div class="ph"><span class="dot"></span>TRIAGE LEDGER<button class="tpk" id="triPack" title="export every confirmed finding as submission-ready markdown (.zip)" style="margin-left:auto">⬇ PACK</button><span class="x" id="triCnt" style="margin-left:8px">00</span></div><div class="sevrow" id="sevrow"></div><div class="tlist" id="tlist"><div class="tempty">// no confirmed contacts<br>// failed Δ-state &gt; dropped<br>// standby_</div></div></div>
+    <div class="panel c2"><div class="ph"><span class="dot"></span>C2 EVENT LOG</div><div class="c2log" id="c2log"></div></div>
+  </aside>
+
+  <footer class="bottom panel" style="display:flex">
+    <div class="rlabel">TIMELINE</div>
+    <div class="track" id="track"><div class="dim"></div><div class="playhead" id="playhead"></div></div>
+    <div class="speedctl">SPD<input id="speed" type="range" min="120" max="1300" value="600" step="20"></div>
+    <div class="now" id="now">— idle —</div>
+  </footer>
+</div>
+
+<script>window.__DEMO__={"principals":{"A":{"label":"Alice (victim / order-101 owner)","anon":false},"B":{"label":"Bob (attacker / order-202 owner)","anon":false},"anon":{"label":"Anonymous (no session)","anon":true}},"envelopes":{"A":{"object_ids":["101","A"],"effects":["NONE","OBJECT_ACCESS","OWNERSHIP"],"authority":[]},"B":{"object_ids":["202","303","B"],"effects":["OBJECT_ACCESS"],"authority":[]},"anon":{"object_ids":[],"effects":[],"authority":[]}},"catalog":[{"effect":"OBJECT_ACCESS","name":"OBJECT_ACCESS: object_id \u2208 self_envelope","impact":"Data Exposure / Broken Object-Level Authorization"},{"effect":"OWNERSHIP","name":"OWNERSHIP: privileged field is server-authoritative","impact":"Privilege Escalation / Broken Property-Level Authorization"},{"effect":"AUTHORITY","name":"AUTHORITY: action.effect \u2286 principal.envelope","impact":"Broken Function-Level Authorization (BFLA) / Confused Deputy"},{"effect":"PAYMENT","name":"PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal","impact":"Financial Loss / Payment Tampering"},{"effect":"PRICE","name":"PRICE: total == \u03a3(line items)","impact":"Financial Loss / Price Manipulation"},{"effect":"STATE_GATE","name":"STATE_GATE: terminal state requires its predecessor predicate(s)","impact":"Business-Logic Bypass / State-Gate Skip"},{"effect":"INVENTORY","name":"INVENTORY: 0 \u2264 qty \u2264 available","impact":"Inventory / Quantity Abuse"},{"effect":"COUPON","name":"COUPON: redemptions(token) \u2264 declared_limit","impact":"Promotion Abuse / Single-Use Replay"},{"effect":"TEMPORAL_DRIFT","name":"TEMPORAL_DRIFT: credential valid after its revocation event","impact":"Stale Authorization / Revocation Not Enforced"}],"policy_warnings":[],"findings":[{"fid":"AP-7AC82A84","title":"IDOR / BOLA \u2014 cross-principal object access","effect":"OBJECT_ACCESS","impact":"Data Exposure / Broken Object-Level Authorization","severity":"High","law":"OBJECT_ACCESS: object_id \u2208 self_envelope","endpoint":"GET /api/orders/{id}","source":"contract","high_caution":false,"actor":"B","target":"101","owner":"A","causal_path":["Principal 'B' issued GET /api/orders/101 and received 200.","The decisive value originated in principal 'A''s response to GET /api/orders/{id} (field id) \u2014 it was never granted to 'B'.","EIL law violated \u2192 OBJECT_ACCESS: object_id \u2208 self_envelope: object_id=101 accessed by 'B' is not in its measured self-envelope; it provably originated in principal 'A''s response (GET /api/orders/{id} \u2192 id)","Confirmed by \u0394state via three-way differential read-back (owner authoritative + control denial check) with leak audit: BEFORE [object 101 private to 'A'] \u2192 AFTER [object 101 readable by 'B' \u2014 leaked fields: ['owner_id', 'total', 'amount_due', 'paid', 'items']] (read back as 'A')."],"state_proof":{"method":"three-way differential read-back (owner authoritative + control denial check) with leak audit","before":"object 101 private to 'A'","after":"object 101 readable by 'B' \u2014 leaked fields: ['owner_id', 'total', 'amount_due', 'paid', 'items']","read_as":"A","detail":"actor reproduced 5/5 of owner's substantive private fields"},"poc":{"steps":["As 'B', send: GET /api/orders/101","Observe the privileged effect succeed (200).","As the legitimate owner 'A', read the state back to confirm the change/leak persisted."],"curl":["curl -X GET 'https://demo.local/api/orders/101' -H 'Authorization: Bearer $TOKEN_B'","curl -X GET 'https://demo.local/api/orders/101' -H 'Authorization: Bearer $TOKEN_A'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":4.3,"label":"Medium","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N"},"enumerability":{"level":"sequential","note":"identifier is a short sequential integer \u2014 an attacker can enumerate EVERY object by incrementing/decrementing the value; blast radius is the entire collection, not a single record"},"report_markdown":"# IDOR / BOLA \u2014 cross-principal object access\n\n**Finding ID:** `AP-7AC82A84`  \n**Severity:** High  \n**CVSS 3.1:** 4.3 (Medium)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N`  \n**Impact class:** Data Exposure / Broken Object-Level Authorization  \n**Effect-class:** `OBJECT_ACCESS`  \n**Endpoint:** `GET /api/orders/{id}`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **OBJECT_ACCESS: object_id \u2208 self_envelope**, which is true by the definition of the `OBJECT_ACCESS` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'B' issued GET /api/orders/101 and received 200.\n2. The decisive value originated in principal 'A''s response to GET /api/orders/{id} (field id) \u2014 it was never granted to 'B'.\n3. EIL law violated \u2192 OBJECT_ACCESS: object_id \u2208 self_envelope: object_id=101 accessed by 'B' is not in its measured self-envelope; it provably originated in principal 'A''s response (GET /api/orders/{id} \u2192 id)\n4. Confirmed by \u0394state via three-way differential read-back (owner authoritative + control denial check) with leak audit: BEFORE [object 101 private to 'A'] \u2192 AFTER [object 101 readable by 'B' \u2014 leaked fields: ['owner_id', 'total', 'amount_due', 'paid', 'items']] (read back as 'A').\n\n## Proof of \u0394state\n```\nmethod : three-way differential read-back (owner authoritative + control denial check) with leak audit\nbefore : object 101 private to 'A'\nafter  : object 101 readable by 'B' \u2014 leaked fields: ['owner_id', 'total', 'amount_due', 'paid', 'items']\nread as: A\ndetail : actor reproduced 5/5 of owner's substantive private fields\n```\n\n## Reproduction (PoC)\n1. As 'B', send: GET /api/orders/101\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'A', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X GET 'https://demo.local/api/orders/101' -H 'Authorization: Bearer $TOKEN_B'\ncurl -X GET 'https://demo.local/api/orders/101' -H 'Authorization: Bearer $TOKEN_A'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nData Exposure / Broken Object-Level Authorization.\n\n**Blast radius (sequential):** identifier is a short sequential integer \u2014 an attacker can enumerate EVERY object by incrementing/decrementing the value; blast radius is the entire collection, not a single record.\n"},{"fid":"AP-A959F259","title":"Mass Assignment / BOPLA \u2014 privileged field overwrite","effect":"OWNERSHIP","impact":"Privilege Escalation / Broken Property-Level Authorization","severity":"Critical","law":"OWNERSHIP: privileged field is server-authoritative","endpoint":"PATCH /api/users/{id}","source":"contract","high_caution":false,"actor":"B","target":"B","owner":"B","causal_path":["Principal 'B' issued PATCH /api/users/B and received 200.","EIL law violated \u2192 OWNERSHIP: privileged field is server-authoritative: client-supplied privileged field 'role=admin' was accepted and reflected by the server (server-authoritative field mutated via client input)","Confirmed by \u0394state via authenticated read-back of the mutated field: BEFORE ['role' was server-authoritative] \u2192 AFTER ['role' = 'admin' set via client-supplied input] (read back as 'B')."],"state_proof":{"method":"authenticated read-back of the mutated field","before":"'role' was server-authoritative","after":"'role' = 'admin' set via client-supplied input","read_as":"B","detail":"privileged field persisted to the server-side object state"},"poc":{"steps":["As 'B', send: PATCH /api/users/B with body {\"role\": \"admin\"}","Observe the privileged effect succeed (200).","As the legitimate owner 'B', read the state back to confirm the change/leak persisted."],"curl":["curl -X PATCH 'https://demo.local/api/users/B' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"role\": \"admin\"}'","curl -X GET 'https://demo.local/api/users/B' -H 'Authorization: Bearer $TOKEN_B'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":6.5,"label":"Medium","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N"},"enumerability":{"level":"","note":""},"report_markdown":"# Mass Assignment / BOPLA \u2014 privileged field overwrite\n\n**Finding ID:** `AP-A959F259`  \n**Severity:** Critical  \n**CVSS 3.1:** 6.5 (Medium)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N`  \n**Impact class:** Privilege Escalation / Broken Property-Level Authorization  \n**Effect-class:** `OWNERSHIP`  \n**Endpoint:** `PATCH /api/users/{id}`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **OWNERSHIP: privileged field is server-authoritative**, which is true by the definition of the `OWNERSHIP` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'B' issued PATCH /api/users/B and received 200.\n2. EIL law violated \u2192 OWNERSHIP: privileged field is server-authoritative: client-supplied privileged field 'role=admin' was accepted and reflected by the server (server-authoritative field mutated via client input)\n3. Confirmed by \u0394state via authenticated read-back of the mutated field: BEFORE ['role' was server-authoritative] \u2192 AFTER ['role' = 'admin' set via client-supplied input] (read back as 'B').\n\n## Proof of \u0394state\n```\nmethod : authenticated read-back of the mutated field\nbefore : 'role' was server-authoritative\nafter  : 'role' = 'admin' set via client-supplied input\nread as: B\ndetail : privileged field persisted to the server-side object state\n```\n\n## Reproduction (PoC)\n1. As 'B', send: PATCH /api/users/B with body {\"role\": \"admin\"}\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'B', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X PATCH 'https://demo.local/api/users/B' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"role\": \"admin\"}'\ncurl -X GET 'https://demo.local/api/users/B' -H 'Authorization: Bearer $TOKEN_B'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nPrivilege Escalation / Broken Property-Level Authorization.\n"},{"fid":"AP-C76192F8","title":"BFLA \u2014 privileged function reachable without authority","effect":"AUTHORITY","impact":"Broken Function-Level Authorization (BFLA) / Confused Deputy","severity":"High","law":"AUTHORITY: action.effect \u2286 principal.envelope","endpoint":"GET /api/admin/users","source":"contract","high_caution":false,"actor":"anon","target":"function","owner":"anon","causal_path":["Principal 'anon' issued GET /api/admin/users and received 200.","EIL law violated \u2192 AUTHORITY: action.effect \u2286 principal.envelope: anonymous principal successfully invoked privileged function GET /api/admin/users","Confirmed by \u0394state via response-payload inspection + envelope authority check: BEFORE [function exposes data for principals ['A', 'B']] \u2192 AFTER ['anon' (no authority over this function) obtained that data] (read back as 'anon')."],"state_proof":{"method":"response-payload inspection + envelope authority check","before":"function exposes data for principals ['A', 'B']","after":"'anon' (no authority over this function) obtained that data","read_as":"anon","detail":"privileged function returned cross-principal data to a non-authorised actor"},"poc":{"steps":["As 'anon', send: GET /api/admin/users","Observe the privileged effect succeed (200).","As the legitimate owner 'anon', read the state back to confirm the change/leak persisted."],"curl":["curl -X GET 'https://demo.local/api/admin/users' -H 'Authorization: Bearer $TOKEN_anon'","curl -X GET 'https://demo.local/api/admin/users' -H 'Authorization: Bearer $TOKEN_anon'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":8.2,"label":"High","vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N"},"enumerability":{"level":"","note":""},"report_markdown":"# BFLA \u2014 privileged function reachable without authority\n\n**Finding ID:** `AP-C76192F8`  \n**Severity:** High  \n**CVSS 3.1:** 8.2 (High)  `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N`  \n**Impact class:** Broken Function-Level Authorization (BFLA) / Confused Deputy  \n**Effect-class:** `AUTHORITY`  \n**Endpoint:** `GET /api/admin/users`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **AUTHORITY: action.effect \u2286 principal.envelope**, which is true by the definition of the `AUTHORITY` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'anon' issued GET /api/admin/users and received 200.\n2. EIL law violated \u2192 AUTHORITY: action.effect \u2286 principal.envelope: anonymous principal successfully invoked privileged function GET /api/admin/users\n3. Confirmed by \u0394state via response-payload inspection + envelope authority check: BEFORE [function exposes data for principals ['A', 'B']] \u2192 AFTER ['anon' (no authority over this function) obtained that data] (read back as 'anon').\n\n## Proof of \u0394state\n```\nmethod : response-payload inspection + envelope authority check\nbefore : function exposes data for principals ['A', 'B']\nafter  : 'anon' (no authority over this function) obtained that data\nread as: anon\ndetail : privileged function returned cross-principal data to a non-authorised actor\n```\n\n## Reproduction (PoC)\n1. As 'anon', send: GET /api/admin/users\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'anon', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X GET 'https://demo.local/api/admin/users' -H 'Authorization: Bearer $TOKEN_anon'\ncurl -X GET 'https://demo.local/api/admin/users' -H 'Authorization: Bearer $TOKEN_anon'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nBroken Function-Level Authorization (BFLA) / Confused Deputy.\n"},{"fid":"AP-1E2CAFAE","title":"Payment Tampering \u2014 settlement below amount due","effect":"PAYMENT","impact":"Financial Loss / Payment Tampering","severity":"Critical","law":"PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal","endpoint":"POST /api/checkout","source":"contract","high_caution":false,"actor":"B","target":"202","owner":"B","causal_path":["Principal 'B' issued POST /api/checkout and received 200.","EIL law violated \u2192 PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal: amount_paid=1.0 < amount_due=90.0 on a successful payment \u2014 value-conservation law violated","Confirmed by \u0394state via authenticated read-back of order settlement state: BEFORE [amount_due = 90.0] \u2192 AFTER [order settled (paid) with amount_paid = 1.0 (shortfall 89.0)] (read back as 'B')."],"state_proof":{"method":"authenticated read-back of order settlement state","before":"amount_due = 90.0","after":"order settled (paid) with amount_paid = 1.0 (shortfall 89.0)","read_as":"B","detail":"order reached terminal paid state below the amount due"},"poc":{"steps":["As 'B', send: POST /api/checkout with body {\"order_id\": \"202\", \"amount_due\": 90.0, \"amount_paid\": 1.0}","Observe the privileged effect succeed (200).","As the legitimate owner 'B', read the state back to confirm the change/leak persisted."],"curl":["curl -X POST 'https://demo.local/api/checkout' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"order_id\": \"202\", \"amount_due\": 90.0, \"amount_paid\": 1.0}'","curl -X GET 'https://demo.local/api/orders/202' -H 'Authorization: Bearer $TOKEN_B'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":8.5,"label":"High","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:N"},"enumerability":{"level":"","note":""},"report_markdown":"# Payment Tampering \u2014 settlement below amount due\n\n**Finding ID:** `AP-1E2CAFAE`  \n**Severity:** Critical  \n**CVSS 3.1:** 8.5 (High)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:N`  \n**Impact class:** Financial Loss / Payment Tampering  \n**Effect-class:** `PAYMENT`  \n**Endpoint:** `POST /api/checkout`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal**, which is true by the definition of the `PAYMENT` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'B' issued POST /api/checkout and received 200.\n2. EIL law violated \u2192 PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal: amount_paid=1.0 < amount_due=90.0 on a successful payment \u2014 value-conservation law violated\n3. Confirmed by \u0394state via authenticated read-back of order settlement state: BEFORE [amount_due = 90.0] \u2192 AFTER [order settled (paid) with amount_paid = 1.0 (shortfall 89.0)] (read back as 'B').\n\n## Proof of \u0394state\n```\nmethod : authenticated read-back of order settlement state\nbefore : amount_due = 90.0\nafter  : order settled (paid) with amount_paid = 1.0 (shortfall 89.0)\nread as: B\ndetail : order reached terminal paid state below the amount due\n```\n\n## Reproduction (PoC)\n1. As 'B', send: POST /api/checkout with body {\"order_id\": \"202\", \"amount_due\": 90.0, \"amount_paid\": 1.0}\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'B', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X POST 'https://demo.local/api/checkout' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"order_id\": \"202\", \"amount_due\": 90.0, \"amount_paid\": 1.0}'\ncurl -X GET 'https://demo.local/api/orders/202' -H 'Authorization: Bearer $TOKEN_B'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nFinancial Loss / Payment Tampering.\n"},{"fid":"AP-D907C8DD","title":"Price Manipulation \u2014 client total trusted as authoritative","effect":"PRICE","impact":"Financial Loss / Price Manipulation","severity":"High","law":"PRICE: total == \u03a3(line items)","endpoint":"POST /api/cart/price","source":"contract","high_caution":false,"actor":"B","target":"function","owner":"B","causal_path":["Principal 'B' issued POST /api/cart/price and received 200.","EIL law violated \u2192 PRICE: total == \u03a3(line items): client total=5.0 \u2260 \u03a3(line items)=90.0 \u2014 client-supplied amount is advisory only and must not be authoritative","Confirmed by \u0394state via server-side total reconciliation: BEFORE [line-item sum = 90.0] \u2192 AFTER [server accepted client total = 5.0] (read back as 'B')."],"state_proof":{"method":"server-side total reconciliation","before":"line-item sum = 90.0","after":"server accepted client total = 5.0","read_as":"B","detail":"client-supplied amount was treated as authoritative"},"poc":{"steps":["As 'B', send: POST /api/cart/price with body {\"total\": 5.0, \"items\": [{\"sku\": \"y\", \"price\": 90.0, \"qty\": 1}]}","Observe the privileged effect succeed (200).","As the legitimate owner 'B', read the state back to confirm the change/leak persisted."],"curl":["curl -X POST 'https://demo.local/api/cart/price' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"total\": 5.0, \"items\": [{\"sku\": \"y\", \"price\": 90.0, \"qty\": 1}]}'","curl -X GET 'https://demo.local/api/cart/price' -H 'Authorization: Bearer $TOKEN_B'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":6.5,"label":"Medium","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N"},"enumerability":{"level":"","note":""},"report_markdown":"# Price Manipulation \u2014 client total trusted as authoritative\n\n**Finding ID:** `AP-D907C8DD`  \n**Severity:** High  \n**CVSS 3.1:** 6.5 (Medium)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N`  \n**Impact class:** Financial Loss / Price Manipulation  \n**Effect-class:** `PRICE`  \n**Endpoint:** `POST /api/cart/price`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **PRICE: total == \u03a3(line items)**, which is true by the definition of the `PRICE` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'B' issued POST /api/cart/price and received 200.\n2. EIL law violated \u2192 PRICE: total == \u03a3(line items): client total=5.0 \u2260 \u03a3(line items)=90.0 \u2014 client-supplied amount is advisory only and must not be authoritative\n3. Confirmed by \u0394state via server-side total reconciliation: BEFORE [line-item sum = 90.0] \u2192 AFTER [server accepted client total = 5.0] (read back as 'B').\n\n## Proof of \u0394state\n```\nmethod : server-side total reconciliation\nbefore : line-item sum = 90.0\nafter  : server accepted client total = 5.0\nread as: B\ndetail : client-supplied amount was treated as authoritative\n```\n\n## Reproduction (PoC)\n1. As 'B', send: POST /api/cart/price with body {\"total\": 5.0, \"items\": [{\"sku\": \"y\", \"price\": 90.0, \"qty\": 1}]}\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'B', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X POST 'https://demo.local/api/cart/price' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"total\": 5.0, \"items\": [{\"sku\": \"y\", \"price\": 90.0, \"qty\": 1}]}'\ncurl -X GET 'https://demo.local/api/cart/price' -H 'Authorization: Bearer $TOKEN_B'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nFinancial Loss / Price Manipulation.\n"},{"fid":"AP-654CD365","title":"Business-Logic \u2014 workflow gate skipped","effect":"STATE_GATE","impact":"Business-Logic Bypass / State-Gate Skip","severity":"High","law":"STATE_GATE: terminal state requires its predecessor predicate(s)","endpoint":"POST /api/orders/{id}/fulfil","source":"contract","high_caution":false,"actor":"B","target":"303","owner":"B","causal_path":["Principal 'B' issued POST /api/orders/303/fulfil and received 200.","EIL law violated \u2192 STATE_GATE: terminal state requires its predecessor predicate(s): object reached terminal state 'fulfilled' with 1 predecessor predicate(s) unsatisfied: ['paid equals True'] \u2014 workflow-order gate(s) skipped","Confirmed by \u0394state via authenticated read-back of object workflow state: BEFORE [predecessor gate 'paid equals True' not satisfied] \u2192 AFTER [object reached terminal state 'fulfilled'] (read back as 'B')."],"state_proof":{"method":"authenticated read-back of object workflow state","before":"predecessor gate 'paid equals True' not satisfied","after":"object reached terminal state 'fulfilled'","read_as":"B","detail":"terminal state persisted without its required predecessor"},"poc":{"steps":["As 'B', send: POST /api/orders/303/fulfil","Observe the privileged effect succeed (200).","As the legitimate owner 'B', read the state back to confirm the change/leak persisted."],"curl":["curl -X POST 'https://demo.local/api/orders/303/fulfil' -H 'Authorization: Bearer $TOKEN_B'","curl -X GET 'https://demo.local/api/orders/303' -H 'Authorization: Bearer $TOKEN_B'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":6.5,"label":"Medium","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N"},"enumerability":{"level":"","note":""},"report_markdown":"# Business-Logic \u2014 workflow gate skipped\n\n**Finding ID:** `AP-654CD365`  \n**Severity:** High  \n**CVSS 3.1:** 6.5 (Medium)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N`  \n**Impact class:** Business-Logic Bypass / State-Gate Skip  \n**Effect-class:** `STATE_GATE`  \n**Endpoint:** `POST /api/orders/{id}/fulfil`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **STATE_GATE: terminal state requires its predecessor predicate(s)**, which is true by the definition of the `STATE_GATE` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'B' issued POST /api/orders/303/fulfil and received 200.\n2. EIL law violated \u2192 STATE_GATE: terminal state requires its predecessor predicate(s): object reached terminal state 'fulfilled' with 1 predecessor predicate(s) unsatisfied: ['paid equals True'] \u2014 workflow-order gate(s) skipped\n3. Confirmed by \u0394state via authenticated read-back of object workflow state: BEFORE [predecessor gate 'paid equals True' not satisfied] \u2192 AFTER [object reached terminal state 'fulfilled'] (read back as 'B').\n\n## Proof of \u0394state\n```\nmethod : authenticated read-back of object workflow state\nbefore : predecessor gate 'paid equals True' not satisfied\nafter  : object reached terminal state 'fulfilled'\nread as: B\ndetail : terminal state persisted without its required predecessor\n```\n\n## Reproduction (PoC)\n1. As 'B', send: POST /api/orders/303/fulfil\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'B', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X POST 'https://demo.local/api/orders/303/fulfil' -H 'Authorization: Bearer $TOKEN_B'\ncurl -X GET 'https://demo.local/api/orders/303' -H 'Authorization: Bearer $TOKEN_B'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nBusiness-Logic Bypass / State-Gate Skip.\n"},{"fid":"AP-21086A38","title":"Promotion Abuse \u2014 single-use token replayed","effect":"COUPON","impact":"Promotion Abuse / Single-Use Replay","severity":"Medium","law":"COUPON: redemptions(token) \u2264 declared_limit","endpoint":"POST /api/coupon/redeem","source":"contract","high_caution":false,"actor":"B","target":"function","owner":"B","causal_path":["Principal 'B' issued POST /api/coupon/redeem and received 200.","EIL law violated \u2192 COUPON: redemptions(token) \u2264 declared_limit: coupon/single-use token 'SAVE20' redeemed 2 times, exceeding declared limit 1 \u2014 single-use replay","Confirmed by \u0394state via measured redemption count across exchanges: BEFORE [declared single-use limit = 1] \u2192 AFTER [token redeemed 2 times with effect each time] (read back as 'B')."],"state_proof":{"method":"measured redemption count across exchanges","before":"declared single-use limit = 1","after":"token redeemed 2 times with effect each time","read_as":"B","detail":"single-use token replayed with additional effect"},"poc":{"steps":["As 'B', send: POST /api/coupon/redeem with body {\"coupon\": \"SAVE20\", \"limit\": 1}","Observe the privileged effect succeed (200).","As the legitimate owner 'B', read the state back to confirm the change/leak persisted."],"curl":["curl -X POST 'https://demo.local/api/coupon/redeem' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"coupon\": \"SAVE20\", \"limit\": 1}'","curl -X GET 'https://demo.local/api/coupon/redeem' -H 'Authorization: Bearer $TOKEN_B'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":4.3,"label":"Medium","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N"},"enumerability":{"level":"","note":""},"report_markdown":"# Promotion Abuse \u2014 single-use token replayed\n\n**Finding ID:** `AP-21086A38`  \n**Severity:** Medium  \n**CVSS 3.1:** 4.3 (Medium)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N`  \n**Impact class:** Promotion Abuse / Single-Use Replay  \n**Effect-class:** `COUPON`  \n**Endpoint:** `POST /api/coupon/redeem`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **COUPON: redemptions(token) \u2264 declared_limit**, which is true by the definition of the `COUPON` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'B' issued POST /api/coupon/redeem and received 200.\n2. EIL law violated \u2192 COUPON: redemptions(token) \u2264 declared_limit: coupon/single-use token 'SAVE20' redeemed 2 times, exceeding declared limit 1 \u2014 single-use replay\n3. Confirmed by \u0394state via measured redemption count across exchanges: BEFORE [declared single-use limit = 1] \u2192 AFTER [token redeemed 2 times with effect each time] (read back as 'B').\n\n## Proof of \u0394state\n```\nmethod : measured redemption count across exchanges\nbefore : declared single-use limit = 1\nafter  : token redeemed 2 times with effect each time\nread as: B\ndetail : single-use token replayed with additional effect\n```\n\n## Reproduction (PoC)\n1. As 'B', send: POST /api/coupon/redeem with body {\"coupon\": \"SAVE20\", \"limit\": 1}\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'B', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X POST 'https://demo.local/api/coupon/redeem' -H 'Authorization: Bearer $TOKEN_B' -H 'Content-Type: application/json' -d '{\"coupon\": \"SAVE20\", \"limit\": 1}'\ncurl -X GET 'https://demo.local/api/coupon/redeem' -H 'Authorization: Bearer $TOKEN_B'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nPromotion Abuse / Single-Use Replay.\n"},{"fid":"AP-59032A9E","title":"Stale Authorization \u2014 credential valid after revocation","effect":"TEMPORAL_DRIFT","impact":"Stale Authorization / Revocation Not Enforced","severity":"Critical","law":"TEMPORAL_DRIFT: credential valid after its revocation event","endpoint":"GET /api/me","source":"contract","high_caution":false,"actor":"A","target":"function","owner":"A","causal_path":["Principal 'A' issued GET /api/me and received 200.","EIL law violated \u2192 TEMPORAL_DRIFT: credential valid after its revocation event: credential used by 'A' was invalidated by a prior password_change event (POST /api/account/password, seq 18) yet still succeeds at GET /api/me (seq 19) \u2014 authorization was not enforced after revocation [contract]","Confirmed by \u0394state via stale-credential replay after recorded revocation event (authenticated read-back, substantive-data required): BEFORE [credential should be invalid after the password_change event (seq 18, POST /api/account/password) with sensitive fields] \u2192 AFTER [stale credential still returns 2 substantive private field(s): ['ssn', 'address'] \u00b7 SENSITIVE fields exposed: ['ssn', 'address']] (read back as 'A')."],"state_proof":{"method":"stale-credential replay after recorded revocation event (authenticated read-back, substantive-data required)","before":"credential should be invalid after the password_change event (seq 18, POST /api/account/password) with sensitive fields","after":"stale credential still returns 2 substantive private field(s): ['ssn', 'address'] \u00b7 SENSITIVE fields exposed: ['ssn', 'address']","read_as":"A","detail":"authorization not enforced after password_change \u2014 credential remained live against private state (basis: contract)"},"poc":{"steps":["As 'A', send: GET /api/me","Observe the privileged effect succeed (200).","As the legitimate owner 'A', read the state back to confirm the change/leak persisted."],"curl":["curl -X GET 'https://demo.local/api/me' -H 'Authorization: Bearer $TOKEN_A'","curl -X GET 'https://demo.local/api/me' -H 'Authorization: Bearer $TOKEN_A'"],"notes":"Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope."},"cvss":{"score":7.1,"label":"High","vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N"},"enumerability":{"level":"slug","note":"identifier is a human-readable slug \u2014 may be guessable or discoverable via search/listing endpoints; assess discoverability for blast radius"},"report_markdown":"# Stale Authorization \u2014 credential valid after revocation\n\n**Finding ID:** `AP-59032A9E`  \n**Severity:** Critical  \n**CVSS 3.1:** 7.1 (High)  `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N`  \n**Impact class:** Stale Authorization / Revocation Not Enforced  \n**Effect-class:** `TEMPORAL_DRIFT`  \n**Endpoint:** `GET /api/me`  \n**Classification source:** contract\n\n## Summary\nThe action violates the conservation law **TEMPORAL_DRIFT: credential valid after its revocation event**, which is true by the definition of the `TEMPORAL_DRIFT` effect-class. The violation was **confirmed by proven \u0394state**, not a status-code diff.\n\n## Causal path (proof)\n1. Principal 'A' issued GET /api/me and received 200.\n2. EIL law violated \u2192 TEMPORAL_DRIFT: credential valid after its revocation event: credential used by 'A' was invalidated by a prior password_change event (POST /api/account/password, seq 18) yet still succeeds at GET /api/me (seq 19) \u2014 authorization was not enforced after revocation [contract]\n3. Confirmed by \u0394state via stale-credential replay after recorded revocation event (authenticated read-back, substantive-data required): BEFORE [credential should be invalid after the password_change event (seq 18, POST /api/account/password) with sensitive fields] \u2192 AFTER [stale credential still returns 2 substantive private field(s): ['ssn', 'address'] \u00b7 SENSITIVE fields exposed: ['ssn', 'address']] (read back as 'A').\n\n## Proof of \u0394state\n```\nmethod : stale-credential replay after recorded revocation event (authenticated read-back, substantive-data required)\nbefore : credential should be invalid after the password_change event (seq 18, POST /api/account/password) with sensitive fields\nafter  : stale credential still returns 2 substantive private field(s): ['ssn', 'address'] \u00b7 SENSITIVE fields exposed: ['ssn', 'address']\nread as: A\ndetail : authorization not enforced after password_change \u2014 credential remained live against private state (basis: contract)\n```\n\n## Reproduction (PoC)\n1. As 'A', send: GET /api/me\n2. Observe the privileged effect succeed (200).\n3. As the legitimate owner 'A', read the state back to confirm the change/leak persisted.\n\n```bash\ncurl -X GET 'https://demo.local/api/me' -H 'Authorization: Bearer $TOKEN_A'\ncurl -X GET 'https://demo.local/api/me' -H 'Authorization: Bearer $TOKEN_A'\n```\n\n> Replace $TOKEN_<pid> with each principal's session credential. Run only within authorised program scope.\n\n## Impact\nStale Authorization / Revocation Not Enforced.\n\n**Blast radius (slug):** identifier is a human-readable slug \u2014 may be guessable or discoverable via search/listing endpoints; assess discoverability for blast radius.\n"}],"traces":[{"tid":"T-7a5e9d2c","principal":"B","method":"GET","path":"/api/orders/202","endpoint":"GET /api/orders/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 8 structurally-significant value(s)","data":{"tagged":8}},{"stage":"EIL","status":"pass","detail":"all applicable conservation laws hold","data":{"law":"OBJECT_ACCESS: object_id \u2208 self_envelope"}}],"outcome":"clean","finding_id":null},{"tid":"T-897827a0","principal":"A","method":"PATCH","path":"/api/users/A","endpoint":"PATCH /api/users/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OWNERSHIP via contract","data":{"effect":"OWNERSHIP","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"pass","detail":"all applicable conservation laws hold","data":{"law":"OWNERSHIP: privileged field is server-authoritative"}}],"outcome":"clean","finding_id":null},{"tid":"T-e6d6b20e","principal":"B","method":"GET","path":"/api/profiles/A","endpoint":"GET /api/profiles/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 2 structurally-significant value(s)","data":{"tagged":2}},{"stage":"EIL","status":"candidate","detail":"OBJECT_ACCESS: object_id \u2208 self_envelope \u2192 object_id=A accessed by 'B' is not in its measured self-envelope; it provably originated in principal 'A''s response (GET /api/orders/{id} \u2192 owner_id)","data":{"law":"OBJECT_ACCESS: object_id \u2208 self_envelope","impact":"Data Exposure / Broken Object-Level Authorization"}},{"stage":"Confirmer","status":"unconfirmed","detail":"no proven \u0394state \u2014 candidate dropped (a status/length diff is NOT a finding)","data":{}}],"outcome":"candidate-unconfirmed","finding_id":null},{"tid":"T-84d8d6b4","principal":"B","method":"GET","path":"/api/orders/101","endpoint":"GET /api/orders/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 8 structurally-significant value(s)","data":{"tagged":8}},{"stage":"EIL","status":"candidate","detail":"OBJECT_ACCESS: object_id \u2208 self_envelope \u2192 object_id=101 accessed by 'B' is not in its measured self-envelope; it provably originated in principal 'A''s response (GET /api/orders/{id} \u2192 id)","data":{"law":"OBJECT_ACCESS: object_id \u2208 self_envelope","impact":"Data Exposure / Broken Object-Level Authorization"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: object 101 private to 'A' \u2192 object 101 readable by 'B' \u2014 leaked fields: ['owner_id', 'total', 'amount_due', 'paid', 'items'] (read as A)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Data Exposure / Broken Object-Level Authorization","data":{"finding_id":"AP-7AC82A84"}}],"outcome":"finding","finding_id":"AP-7AC82A84"},{"tid":"T-4d37da6b","principal":"B","method":"PATCH","path":"/api/users/B","endpoint":"PATCH /api/users/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OWNERSHIP via contract","data":{"effect":"OWNERSHIP","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"candidate","detail":"OWNERSHIP: privileged field is server-authoritative \u2192 client-supplied privileged field 'role=admin' was accepted and reflected by the server (server-authoritative field mutated via client input)","data":{"law":"OWNERSHIP: privileged field is server-authoritative","impact":"Privilege Escalation / Broken Property-Level Authorization"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: 'role' was server-authoritative \u2192 'role' = 'admin' set via client-supplied input (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Critical \u00b7 Privilege Escalation / Broken Property-Level Authorization","data":{"finding_id":"AP-A959F259"}}],"outcome":"finding","finding_id":"AP-A959F259"},{"tid":"T-863910a5","principal":"anon","method":"GET","path":"/api/admin/users","endpoint":"GET /api/admin/users","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=AUTHORITY via contract","data":{"effect":"AUTHORITY","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 8 structurally-significant value(s)","data":{"tagged":8}},{"stage":"EIL","status":"candidate","detail":"AUTHORITY: action.effect \u2286 principal.envelope \u2192 anonymous principal successfully invoked privileged function GET /api/admin/users","data":{"law":"AUTHORITY: action.effect \u2286 principal.envelope","impact":"Broken Function-Level Authorization (BFLA) / Confused Deputy"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: function exposes data for principals ['A', 'B'] \u2192 'anon' (no authority over this function) obtained that data (read as anon)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Broken Function-Level Authorization (BFLA) / Confused Deputy","data":{"finding_id":"AP-C76192F8"}}],"outcome":"finding","finding_id":"AP-C76192F8"},{"tid":"T-2dbdd7d9","principal":"B","method":"POST","path":"/api/checkout","endpoint":"POST /api/checkout","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=PAYMENT via contract","data":{"effect":"PAYMENT","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"candidate","detail":"PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal \u2192 amount_paid=1.0 < amount_due=90.0 on a successful payment \u2014 value-conservation law violated","data":{"law":"PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal","impact":"Financial Loss / Payment Tampering"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: amount_due = 90.0 \u2192 order settled (paid) with amount_paid = 1.0 (shortfall 89.0) (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Critical \u00b7 Financial Loss / Payment Tampering","data":{"finding_id":"AP-1E2CAFAE"}}],"outcome":"finding","finding_id":"AP-1E2CAFAE"},{"tid":"T-e4a9de5b","principal":"B","method":"POST","path":"/api/cart/price","endpoint":"POST /api/cart/price","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=PRICE via contract","data":{"effect":"PRICE","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"candidate","detail":"PRICE: total == \u03a3(line items) \u2192 client total=5.0 \u2260 \u03a3(line items)=90.0 \u2014 client-supplied amount is advisory only and must not be authoritative","data":{"law":"PRICE: total == \u03a3(line items)","impact":"Financial Loss / Price Manipulation"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: line-item sum = 90.0 \u2192 server accepted client total = 5.0 (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Financial Loss / Price Manipulation","data":{"finding_id":"AP-D907C8DD"}}],"outcome":"finding","finding_id":"AP-D907C8DD"},{"tid":"T-4fa31421","principal":"B","method":"POST","path":"/api/orders/303/fulfil","endpoint":"POST /api/orders/{id}/fulfil","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=STATE_GATE via contract","data":{"effect":"STATE_GATE","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 2 structurally-significant value(s)","data":{"tagged":2}},{"stage":"EIL","status":"candidate","detail":"STATE_GATE: terminal state requires its predecessor predicate(s) \u2192 object reached terminal state 'fulfilled' with 1 predecessor predicate(s) unsatisfied: ['paid equals True'] \u2014 workflow-order gate(s) skipped","data":{"law":"STATE_GATE: terminal state requires its predecessor predicate(s)","impact":"Business-Logic Bypass / State-Gate Skip"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: predecessor gate 'paid equals True' not satisfied \u2192 object reached terminal state 'fulfilled' (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Business-Logic Bypass / State-Gate Skip","data":{"finding_id":"AP-654CD365"}}],"outcome":"finding","finding_id":"AP-654CD365"},{"tid":"T-8447a2a5","principal":"B","method":"POST","path":"/api/coupon/redeem","endpoint":"POST /api/coupon/redeem","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=COUPON via contract","data":{"effect":"COUPON","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 3 structurally-significant value(s)","data":{"tagged":3}},{"stage":"EIL","status":"pass","detail":"all applicable conservation laws hold","data":{"law":"COUPON: redemptions(token) \u2264 declared_limit"}}],"outcome":"clean","finding_id":null},{"tid":"T-230c8966","principal":"B","method":"POST","path":"/api/coupon/redeem","endpoint":"POST /api/coupon/redeem","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=COUPON via contract","data":{"effect":"COUPON","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 3 structurally-significant value(s)","data":{"tagged":3}},{"stage":"EIL","status":"candidate","detail":"COUPON: redemptions(token) \u2264 declared_limit \u2192 coupon/single-use token 'SAVE20' redeemed 2 times, exceeding declared limit 1 \u2014 single-use replay","data":{"law":"COUPON: redemptions(token) \u2264 declared_limit","impact":"Promotion Abuse / Single-Use Replay"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: declared single-use limit = 1 \u2192 token redeemed 2 times with effect each time (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Medium \u00b7 Promotion Abuse / Single-Use Replay","data":{"finding_id":"AP-21086A38"}}],"outcome":"finding","finding_id":"AP-21086A38"},{"tid":"T-e1ab471f","principal":"A","method":"GET","path":"/api/me","endpoint":"GET /api/me","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 3 structurally-significant value(s)","data":{"tagged":3}},{"stage":"EIL","status":"candidate","detail":"TEMPORAL_DRIFT: credential valid after its revocation event \u2192 credential used by 'A' was invalidated by a prior password_change event (POST /api/account/password, seq 18) yet still succeeds at GET /api/me (seq 19) \u2014 authorization was not enforced after revocation [contract]","data":{"law":"TEMPORAL_DRIFT: credential valid after its revocation event","impact":"Stale Authorization / Revocation Not Enforced"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: credential should be invalid after the password_change event (seq 18, POST /api/account/password) with sensitive fields \u2192 stale credential still returns 2 substantive private field(s): ['ssn', 'address'] \u00b7 SENSITIVE fields exposed: ['ssn', 'address'] (read as A)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Critical \u00b7 Stale Authorization / Revocation Not Enforced","data":{"finding_id":"AP-59032A9E"}}],"outcome":"finding","finding_id":"AP-59032A9E"}],"counts":{"analyzed":12,"findings":8,"candidates_dropped":1,"clean":3,"halted":0,"severity":{"Critical":3,"High":4,"Medium":1,"Low":0}},"timeline":[{"seeds":[{"label":"Alice reads her own order 101","principal":"A","method":"GET","path":"/api/orders/101"},{"label":"Bob reads his own order 202","principal":"B","method":"GET","path":"/api/orders/202"},{"label":"Bob reads his own (unpaid) order 303","principal":"B","method":"GET","path":"/api/orders/303"},{"label":"Alice updates her own display name","principal":"A","method":"PATCH","path":"/api/users/A"},{"label":"Alice reads her own protected profile","principal":"A","method":"GET","path":"/api/profiles/A"},{"label":"Alice reads her own session profile (legit, pre-event)","principal":"A","method":"GET","path":"/api/me"},{"label":"Alice changes her password (revocation event \u2014 should kill old token)","principal":"A","method":"POST","path":"/api/account/password"}]},{"label":"Bob re-reads his OWN order 202 (benign)","expect":"clean","expect_effect":"OBJECT_ACCESS","trace":{"tid":"T-7a5e9d2c","principal":"B","method":"GET","path":"/api/orders/202","endpoint":"GET /api/orders/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 8 structurally-significant value(s)","data":{"tagged":8}},{"stage":"EIL","status":"pass","detail":"all applicable conservation laws hold","data":{"law":"OBJECT_ACCESS: object_id \u2208 self_envelope"}}],"outcome":"clean","finding_id":null}},{"label":"Alice updates her OWN non-privileged field (benign)","expect":"clean","expect_effect":"OWNERSHIP","trace":{"tid":"T-897827a0","principal":"A","method":"PATCH","path":"/api/users/A","endpoint":"PATCH /api/users/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OWNERSHIP via contract","data":{"effect":"OWNERSHIP","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"pass","detail":"all applicable conservation laws hold","data":{"law":"OWNERSHIP: privileged field is server-authoritative"}}],"outcome":"clean","finding_id":null}},{"label":"Bob requests Alice's profile, server soft-denies with 200 (D3 trap \u2014 candidate flagged, \u0394state must DROP it)","expect":"clean","expect_effect":"OBJECT_ACCESS","trace":{"tid":"T-e6d6b20e","principal":"B","method":"GET","path":"/api/profiles/A","endpoint":"GET /api/profiles/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 2 structurally-significant value(s)","data":{"tagged":2}},{"stage":"EIL","status":"candidate","detail":"OBJECT_ACCESS: object_id \u2208 self_envelope \u2192 object_id=A accessed by 'B' is not in its measured self-envelope; it provably originated in principal 'A''s response (GET /api/orders/{id} \u2192 owner_id)","data":{"law":"OBJECT_ACCESS: object_id \u2208 self_envelope","impact":"Data Exposure / Broken Object-Level Authorization"}},{"stage":"Confirmer","status":"unconfirmed","detail":"no proven \u0394state \u2014 candidate dropped (a status/length diff is NOT a finding)","data":{}}],"outcome":"candidate-unconfirmed","finding_id":null}},{"label":"Bob reads Alice's order 101 (IDOR/BOLA)","expect":"finding","expect_effect":"OBJECT_ACCESS","trace":{"tid":"T-84d8d6b4","principal":"B","method":"GET","path":"/api/orders/101","endpoint":"GET /api/orders/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 8 structurally-significant value(s)","data":{"tagged":8}},{"stage":"EIL","status":"candidate","detail":"OBJECT_ACCESS: object_id \u2208 self_envelope \u2192 object_id=101 accessed by 'B' is not in its measured self-envelope; it provably originated in principal 'A''s response (GET /api/orders/{id} \u2192 id)","data":{"law":"OBJECT_ACCESS: object_id \u2208 self_envelope","impact":"Data Exposure / Broken Object-Level Authorization"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: object 101 private to 'A' \u2192 object 101 readable by 'B' \u2014 leaked fields: ['owner_id', 'total', 'amount_due', 'paid', 'items'] (read as A)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Data Exposure / Broken Object-Level Authorization","data":{"finding_id":"AP-7AC82A84"}}],"outcome":"finding","finding_id":"AP-7AC82A84"}},{"label":"Bob sets his own role=admin (mass assignment/BOPLA)","expect":"finding","expect_effect":"OWNERSHIP","trace":{"tid":"T-4d37da6b","principal":"B","method":"PATCH","path":"/api/users/B","endpoint":"PATCH /api/users/{id}","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OWNERSHIP via contract","data":{"effect":"OWNERSHIP","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"candidate","detail":"OWNERSHIP: privileged field is server-authoritative \u2192 client-supplied privileged field 'role=admin' was accepted and reflected by the server (server-authoritative field mutated via client input)","data":{"law":"OWNERSHIP: privileged field is server-authoritative","impact":"Privilege Escalation / Broken Property-Level Authorization"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: 'role' was server-authoritative \u2192 'role' = 'admin' set via client-supplied input (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Critical \u00b7 Privilege Escalation / Broken Property-Level Authorization","data":{"finding_id":"AP-A959F259"}}],"outcome":"finding","finding_id":"AP-A959F259"}},{"label":"Anonymous lists all users (BFLA)","expect":"finding","expect_effect":"AUTHORITY","trace":{"tid":"T-863910a5","principal":"anon","method":"GET","path":"/api/admin/users","endpoint":"GET /api/admin/users","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=AUTHORITY via contract","data":{"effect":"AUTHORITY","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 8 structurally-significant value(s)","data":{"tagged":8}},{"stage":"EIL","status":"candidate","detail":"AUTHORITY: action.effect \u2286 principal.envelope \u2192 anonymous principal successfully invoked privileged function GET /api/admin/users","data":{"law":"AUTHORITY: action.effect \u2286 principal.envelope","impact":"Broken Function-Level Authorization (BFLA) / Confused Deputy"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: function exposes data for principals ['A', 'B'] \u2192 'anon' (no authority over this function) obtained that data (read as anon)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Broken Function-Level Authorization (BFLA) / Confused Deputy","data":{"finding_id":"AP-C76192F8"}}],"outcome":"finding","finding_id":"AP-C76192F8"}},{"label":"Bob pays 1.00 on a 90.00 order (payment tampering)","expect":"finding","expect_effect":"PAYMENT","trace":{"tid":"T-2dbdd7d9","principal":"B","method":"POST","path":"/api/checkout","endpoint":"POST /api/checkout","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=PAYMENT via contract","data":{"effect":"PAYMENT","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"candidate","detail":"PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal \u2192 amount_paid=1.0 < amount_due=90.0 on a successful payment \u2014 value-conservation law violated","data":{"law":"PAYMENT: amount_paid \u2265 amount_due \u2227 same currency \u2227 paid-state terminal","impact":"Financial Loss / Payment Tampering"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: amount_due = 90.0 \u2192 order settled (paid) with amount_paid = 1.0 (shortfall 89.0) (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Critical \u00b7 Financial Loss / Payment Tampering","data":{"finding_id":"AP-1E2CAFAE"}}],"outcome":"finding","finding_id":"AP-1E2CAFAE"}},{"label":"Bob declares total=5.00 for a 90.00 cart (price tampering)","expect":"finding","expect_effect":"PRICE","trace":{"tid":"T-e4a9de5b","principal":"B","method":"POST","path":"/api/cart/price","endpoint":"POST /api/cart/price","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=PRICE via contract","data":{"effect":"PRICE","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 4 structurally-significant value(s)","data":{"tagged":4}},{"stage":"EIL","status":"candidate","detail":"PRICE: total == \u03a3(line items) \u2192 client total=5.0 \u2260 \u03a3(line items)=90.0 \u2014 client-supplied amount is advisory only and must not be authoritative","data":{"law":"PRICE: total == \u03a3(line items)","impact":"Financial Loss / Price Manipulation"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: line-item sum = 90.0 \u2192 server accepted client total = 5.0 (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Financial Loss / Price Manipulation","data":{"finding_id":"AP-D907C8DD"}}],"outcome":"finding","finding_id":"AP-D907C8DD"}},{"label":"Bob fulfils unpaid order 303 (state-gate skip)","expect":"finding","expect_effect":"STATE_GATE","trace":{"tid":"T-4fa31421","principal":"B","method":"POST","path":"/api/orders/303/fulfil","endpoint":"POST /api/orders/{id}/fulfil","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=STATE_GATE via contract","data":{"effect":"STATE_GATE","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 2 structurally-significant value(s)","data":{"tagged":2}},{"stage":"EIL","status":"candidate","detail":"STATE_GATE: terminal state requires its predecessor predicate(s) \u2192 object reached terminal state 'fulfilled' with 1 predecessor predicate(s) unsatisfied: ['paid equals True'] \u2014 workflow-order gate(s) skipped","data":{"law":"STATE_GATE: terminal state requires its predecessor predicate(s)","impact":"Business-Logic Bypass / State-Gate Skip"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: predecessor gate 'paid equals True' not satisfied \u2192 object reached terminal state 'fulfilled' (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"High \u00b7 Business-Logic Bypass / State-Gate Skip","data":{"finding_id":"AP-654CD365"}}],"outcome":"finding","finding_id":"AP-654CD365"}},{"label":"Bob redeems single-use coupon (1st time)","expect":"clean","expect_effect":"COUPON","trace":{"tid":"T-8447a2a5","principal":"B","method":"POST","path":"/api/coupon/redeem","endpoint":"POST /api/coupon/redeem","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=COUPON via contract","data":{"effect":"COUPON","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 3 structurally-significant value(s)","data":{"tagged":3}},{"stage":"EIL","status":"pass","detail":"all applicable conservation laws hold","data":{"law":"COUPON: redemptions(token) \u2264 declared_limit"}}],"outcome":"clean","finding_id":null}},{"label":"Bob redeems the SAME single-use coupon again (coupon reuse)","expect":"finding","expect_effect":"COUPON","trace":{"tid":"T-230c8966","principal":"B","method":"POST","path":"/api/coupon/redeem","endpoint":"POST /api/coupon/redeem","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=COUPON via contract","data":{"effect":"COUPON","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 3 structurally-significant value(s)","data":{"tagged":3}},{"stage":"EIL","status":"candidate","detail":"COUPON: redemptions(token) \u2264 declared_limit \u2192 coupon/single-use token 'SAVE20' redeemed 2 times, exceeding declared limit 1 \u2014 single-use replay","data":{"law":"COUPON: redemptions(token) \u2264 declared_limit","impact":"Promotion Abuse / Single-Use Replay"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: declared single-use limit = 1 \u2192 token redeemed 2 times with effect each time (read as B)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Medium \u00b7 Promotion Abuse / Single-Use Replay","data":{"finding_id":"AP-21086A38"}}],"outcome":"finding","finding_id":"AP-21086A38"}},{"label":"Alice's OLD token still reads private data AFTER password change (temporal authorization drift \u2014 token never revoked)","expect":"finding","expect_effect":"TEMPORAL_DRIFT","trace":{"tid":"T-e1ab471f","principal":"A","method":"GET","path":"/api/me","endpoint":"GET /api/me","status_code":200,"stages":[{"stage":"Scope-Guard","status":"ok","detail":"host is in authorised scope","data":{}},{"stage":"Contract Resolver","status":"ok","detail":"effect=OBJECT_ACCESS via contract","data":{"effect":"OBJECT_ACCESS","source":"contract","high_caution":false}},{"stage":"Value-Origin","status":"ok","detail":"tagged 3 structurally-significant value(s)","data":{"tagged":3}},{"stage":"EIL","status":"candidate","detail":"TEMPORAL_DRIFT: credential valid after its revocation event \u2192 credential used by 'A' was invalidated by a prior password_change event (POST /api/account/password, seq 18) yet still succeeds at GET /api/me (seq 19) \u2014 authorization was not enforced after revocation [contract]","data":{"law":"TEMPORAL_DRIFT: credential valid after its revocation event","impact":"Stale Authorization / Revocation Not Enforced"}},{"stage":"Confirmer","status":"confirmed","detail":"\u0394state proven: credential should be invalid after the password_change event (seq 18, POST /api/account/password) with sensitive fields \u2192 stale credential still returns 2 substantive private field(s): ['ssn', 'address'] \u00b7 SENSITIVE fields exposed: ['ssn', 'address'] (read as A)","data":{}},{"stage":"Evidence\u2192PoC","status":"ok","detail":"Critical \u00b7 Stale Authorization / Revocation Not Enforced","data":{"finding_id":"AP-59032A9E"}}],"outcome":"finding","finding_id":"AP-59032A9E"}}]};</script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+const hx=n=>Math.floor(Math.random()*16**n).toString(16).padStart(n,"0");
+const now=()=>new Date().toISOString().substr(11,8);
+let SPEED=600;$("#speed").oninput=e=>SPEED=1420-(+e.target.value);
+const ST={snap:null,items:[],moment:-1,playing:false,sel:null,pkt:0,nodeSel:null,started:false};
+let fireT=0;function fireResize(){clearTimeout(fireT);fireT=setTimeout(()=>dispatchEvent(new Event("resize")),60);}
+
+/* ===== matrix depth background ===== */
+const mxc=$("#mx"),mc=mxc.getContext("2d");let MW,MH,cols,drops;
+function mxResize(){MW=mxc.width=innerWidth;MH=mxc.height=innerHeight;cols=Math.floor(MW/16);drops=Array.from({length:cols},()=>Math.random()*MH/16);}
+mxResize();const GL="01░▒▓<>/\\{}[]#%&ABCDEF0123456789▚▞◢◣";let mxLast=0;
+function mxDraw(t){requestAnimationFrame(mxDraw);if(t-mxLast<58)return;mxLast=t;
+  mc.fillStyle="rgba(5,5,7,.17)";mc.fillRect(0,0,MW,MH);mc.font="13px ui-monospace,monospace";
+  for(let i=0;i<cols;i++){const ch=GL[Math.floor(Math.random()*GL.length)],x=i*16,y=drops[i]*16;
+    mc.fillStyle=Math.random()<0.045?"rgba(255,90,100,.5)":"rgba(120,40,46,.3)";mc.fillText(ch,x,y);
+    if(y>MH&&Math.random()>0.975)drops[i]=0;drops[i]++;}}
+requestAnimationFrame(mxDraw);
+
+/* ===== particle field ===== */
+const bg=$("#bg"),bx=bg.getContext("2d");let BW,BH,P=[];
+function bgResize(){BW=bg.width=innerWidth;BH=bg.height=innerHeight;}
+bgResize();for(let i=0;i<54;i++)P.push({x:Math.random()*BW,y:Math.random()*BH,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25});
+let bgLast=0;
+function bgDraw(t){requestAnimationFrame(bgDraw);if(t-bgLast<34)return;bgLast=t;bx.clearRect(0,0,BW,BH);
+  for(const p of P){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>BW)p.vx*=-1;if(p.y<0||p.y>BH)p.vy*=-1;}
+  for(let i=0;i<P.length;i++){const a=P[i];for(let j=i+1;j<P.length;j++){const b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<118){bx.strokeStyle="rgba(255,34,54,"+(0.06*(1-d/118))+")";bx.lineWidth=1;bx.beginPath();bx.moveTo(a.x,a.y);bx.lineTo(b.x,b.y);bx.stroke();}}
+    bx.fillStyle="rgba(255,80,95,.25)";bx.fillRect(a.x,a.y,1.4,1.4);}}
+requestAnimationFrame(bgDraw);
+addEventListener("resize",()=>{mxResize();bgResize();});
+
+/* ===== telemetry ===== */
+$("#tSes").textContent="0x"+hx(4).toUpperCase();
+setInterval(()=>$("#tClk").textContent=now(),1000);
+function bumpPkt(n){ST.pkt+=n;$("#tPkt").textContent=String(ST.pkt).padStart(4,"0");}
+
+/* ===== throughput sparkline ===== */
+const spk=$("#spk"),sx=spk.getContext("2d");let SP=new Array(64).fill(0),rps=0;
+function spkResize(){spk.width=spk.clientWidth||200;spk.height=46;}
+function spkTick(){const base=ST.playing?2.2:0.5,noise=Math.random()*(ST.playing?3.5:1.0);
+  rps=Math.max(0,rps*0.6+(base+noise)*0.4);SP.push(rps);SP.shift();$("#tRps").textContent=rps.toFixed(1);$("#thruNum").textContent=rps.toFixed(1)+"/s";
+  const W=spk.width,H=spk.height,mxv=Math.max(4,...SP);sx.clearRect(0,0,W,H);sx.beginPath();
+  SP.forEach((v,i)=>{const x=i/(SP.length-1)*W,y=H-2-(v/mxv)*(H-6);i?sx.lineTo(x,y):sx.moveTo(x,y);});
+  sx.strokeStyle="#ff2236";sx.lineWidth=1.5;sx.shadowColor="#ff2236";sx.shadowBlur=6;sx.stroke();sx.shadowBlur=0;
+  sx.lineTo(W,H);sx.lineTo(0,H);sx.closePath();sx.fillStyle="rgba(255,34,54,.08)";sx.fill();}
+setTimeout(spkResize,30);addEventListener("resize",spkResize);setInterval(spkTick,140);
+
+/* ===== C2 log ===== */
+const HEARTBEAT=["scope demo.local nominal","provenance store synced","envelope axis stable","awaiting operator command","scope-guard armed","dry-run enforced"];
+function c2(kind,txt){const lg=$("#c2log");const row=el("div","l",`<span class="t">${now()}</span> <span class="${kind}">${esc(txt)}</span>`);lg.appendChild(row);while(lg.children.length>90)lg.removeChild(lg.firstChild);lg.scrollTop=lg.scrollHeight;}
+setInterval(()=>{if(!ST.playing)c2("inf","· "+HEARTBEAT[Math.floor(Math.random()*HEARTBEAT.length)]+" "+hx(3));},1700);
+c2("ok","ONYX core online");c2("inf","8 effect-invariant laws loaded");
+
+/* ===== ticker ===== */
+const SEED=["GET /api/orders/101","PATCH /api/users/B","POST /api/checkout","GET /api/admin/users","POST /api/cart/price","GET /api/profiles/A","POST /api/coupon/redeem"];
+const tickStr=(l,c)=>`${l} ▸ ${c>=400?'<em>'+c+'</em>':'<span class="g">'+c+'</span>'}  ·  `;
+function refreshTicker(extra){const base=SEED.map(l=>tickStr(l,[200,200,403,401,200][Math.floor(Math.random()*5)])).join("");const one=(extra||[]).join("")+base;$("#tickStrip").innerHTML=one+one;}
+refreshTicker();
+
+/* ===== lattice ===== */
+const cv=$("#cv"),ctx=cv.getContext("2d");
+let G={nodes:[],edges:[],map:{}},DPR=Math.min(devicePixelRatio||1,2),W=0,H=0,drag=null,hover=null,alpha=0,mx=-99,my=-99;
+function resize(){const r=cv.parentElement.getBoundingClientRect();W=r.width||900;H=r.height||500;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+addEventListener("resize",resize);
+function refTag(id){let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))&0xfff;return"R"+h.toString(16).toUpperCase().padStart(3,"0");}
+function buildGraph(snap){const nodes=[],map={},edges=[];const add=(id,label,type)=>{if(map[id])return map[id];const n={id,label,type,tag:refTag(id),ph:Math.random()*6.28,x:W/2+(Math.random()-.5)*240,y:H/2+(Math.random()-.5)*180,vx:0,vy:0};map[id]=n;nodes.push(n);return n;};
+  Object.entries(snap.principals||{}).forEach(([pid,m])=>add("P:"+pid,m.anon?"∅"+pid:pid,"principal"));
+  Object.entries(snap.envelopes||{}).forEach(([pid,env])=>{(env.object_ids||[]).forEach(o=>{const oid="O:"+o;add(oid,o,"object");edges.push({a:"P:"+pid,b:oid,kind:"legit"});});});
+  G={nodes,edges,map};return G;}
+const shortFn=ep=>ep.split(" ").pop().split("/").slice(-2).join("/");
+function addViolation(f){const a="P:"+f.actor;let b;if(f.target==="function"){b="F:"+f.endpoint;if(!G.map[b]){const n={id:b,label:shortFn(f.endpoint),type:"func",tag:refTag(b),ph:Math.random()*6.28,x:W*0.72,y:H/2+(Math.random()-.5)*150,vx:0,vy:0};G.map[b]=n;G.nodes.push(n);}}else{b="O:"+f.target;if(!G.map[b]){const n={id:b,label:f.target,type:"object",tag:refTag(b),ph:Math.random()*6.28,x:W*0.72,y:H/2,vx:0,vy:0};G.map[b]=n;G.nodes.push(n);}}
+  if(!G.edges.some(e=>e.kind==="viol"&&e.f&&e.f.fid===f.fid))G.edges.push({a,b,kind:"viol",f,t0:performance.now()});alpha=1;}
+function physics(){const N=G.nodes;if(!N.length)return;for(let i=0;i<N.length;i++){const p=N[i];if(p===drag)continue;const tx=p.type==="principal"?W*0.26:W*0.74,ty=H*0.5;p.vx+=(tx-p.x)*0.0015;p.vy+=(ty-p.y)*0.0015;
+    for(let j=0;j<N.length;j++){if(i===j)continue;const q=N[j];let dx=p.x-q.x,dy=p.y-q.y,d2=dx*dx+dy*dy+.01,d=Math.sqrt(d2),rep=2600/d2;p.vx+=dx/d*rep;p.vy+=dy/d*rep;}}
+  G.edges.forEach(e=>{const A=G.map[e.a],B=G.map[e.b];if(!A||!B)return;let dx=B.x-A.x,dy=B.y-A.y,d=Math.sqrt(dx*dx+dy*dy)||1,L=e.kind==="viol"?160:118,f=(d-L)*.012,fx=dx/d*f,fy=dy/d*f;if(A!==drag){A.vx+=fx;A.vy+=fy}if(B!==drag){B.vx-=fx;B.vy-=fy}});
+  N.forEach(p=>{if(p===drag)return;p.vx*=.86;p.vy*=.86;p.x+=p.vx;p.y+=p.vy;p.x=Math.max(50,Math.min(W-50,p.x));p.y=Math.max(44,Math.min(H-46,p.y));});alpha*=.992;}
+let dash=0;const px=n=>n.x+Math.sin(performance.now()/1400+n.ph)*2.2,py=n=>n.y+Math.cos(performance.now()/1500+n.ph)*2.2;
+function gridLines(){ctx.strokeStyle="rgba(120,40,46,.05)";ctx.lineWidth=1;for(let x=(W%28)/2;x<W;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=(H%28)/2;y<H;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  if(mx>0){ctx.strokeStyle="rgba(255,34,54,.15)";ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(mx,0);ctx.lineTo(mx,H);ctx.moveTo(0,my);ctx.lineTo(W,my);ctx.stroke();ctx.setLineDash([]);}}
+function render(){ctx.clearRect(0,0,W,H);gridLines();dash=(dash+.6)%14;const T=performance.now();
+  G.edges.forEach(e=>{const A=G.map[e.a],B=G.map[e.b];if(!A||!B)return;const ax=px(A),ay=py(A),bxp=px(B),byp=py(B),mxp=(ax+bxp)/2,myp=(ay+byp)/2-16;ctx.beginPath();ctx.moveTo(ax,ay);ctx.quadraticCurveTo(mxp,myp,bxp,byp);const hl=ST.nodeSel&&(e.a===ST.nodeSel||e.b===ST.nodeSel);
+    if(e.kind==="viol"){const on=(ST.sel&&e.f&&ST.sel===e.f.fid)||hl;ctx.setLineDash([7,7]);ctx.lineDashOffset=-dash;ctx.strokeStyle=on?"#ff6470":"rgba(255,34,54,.7)";ctx.lineWidth=on?2.6:1.8;ctx.shadowColor="#ff2236";ctx.shadowBlur=on?14:7;ctx.stroke();ctx.shadowBlur=0;ctx.setLineDash([]);
+      const t=(T/(on?700:1500))%1,qx=(1-t)*(1-t)*ax+2*(1-t)*t*mxp+t*t*bxp,qy=(1-t)*(1-t)*ay+2*(1-t)*t*myp+t*t*byp;ctx.beginPath();ctx.arc(qx,qy,on?4:3,0,7);ctx.fillStyle="#ffb3b8";ctx.fill();
+      const age=Math.min(1,(T-(e.t0||0))/400);ctx.beginPath();ctx.arc(bxp,byp,17+2*Math.sin(T/300),0,7);ctx.strokeStyle="rgba(255,34,54,"+(.45*age)+")";ctx.lineWidth=1.3;ctx.stroke();}
+    else{ctx.setLineDash([]);ctx.strokeStyle=hl?"rgba(95,176,230,.55)":"rgba(120,90,95,.32)";ctx.lineWidth=hl?1.5:1;ctx.stroke();const t=((T/2600)+A.ph)%1,qx=(1-t)*(1-t)*ax+2*(1-t)*t*mxp+t*t*bxp,qy=(1-t)*(1-t)*ay+2*(1-t)*t*myp+t*t*byp;ctx.beginPath();ctx.arc(qx,qy,1.6,0,7);ctx.fillStyle="rgba(150,110,115,.5)";ctx.fill();}});
+  G.nodes.forEach(n=>{const x=px(n),y=py(n),h=hover===n||ST.nodeSel===n.id;
+    if(n.type==="principal"){ctx.beginPath();ctx.arc(x,y,h?15:13,0,7);ctx.fillStyle="#0c0809";ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=n.label.startsWith("∅")?"#8a767a":"#ece2e2";ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=h?12:5;ctx.stroke();ctx.shadowBlur=0;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fillStyle=ctx.strokeStyle;ctx.fill();}
+    else if(n.type==="func"){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillStyle="#0c0809";ctx.fillRect(-11,-11,22,22);ctx.strokeStyle="#f5b53d";ctx.lineWidth=1.6;ctx.strokeRect(-11,-11,22,22);ctx.restore();ctx.fillStyle="#f5b53d";ctx.font="bold 12px ui-monospace,monospace";ctx.textAlign="center";ctx.fillText("!",x,y+4);}
+    else{ctx.fillStyle="#0c0809";ctx.fillRect(x-12,y-9,24,18);ctx.lineWidth=1.3;ctx.strokeStyle=h?"#ece2e2":"#6a5256";ctx.strokeRect(x-12,y-9,24,18);ctx.strokeRect(x-12,y-9,4,18);}
+    ctx.fillStyle=n.type==="principal"?"#ece2e2":"#c0a8ac";ctx.font=(n.type==="principal"?"bold 12px ":"11px ")+"ui-monospace,monospace";ctx.textAlign="center";ctx.fillText(n.label,x,y+(n.type==="principal"?28:30));
+    ctx.fillStyle="rgba(138,118,122,.5)";ctx.font="8px ui-monospace,monospace";ctx.fillText(n.tag,x,y+(n.type==="principal"?39:41));});}
+function loop(){physics();if(alpha<.02)alpha=.02;render();requestAnimationFrame(loop);}
+const nodeAt=(x,y)=>G.nodes.find(n=>Math.hypot(px(n)-x,py(n)-y)<19);
+cv.addEventListener("mousedown",e=>{const r=cv.getBoundingClientRect();drag=nodeAt(e.clientX-r.left,e.clientY-r.top);});
+addEventListener("mouseup",()=>drag=null);
+cv.addEventListener("click",e=>{const r=cv.getBoundingClientRect();const n=nodeAt(e.clientX-r.left,e.clientY-r.top);ST.nodeSel=n?(ST.nodeSel===n.id?null:n.id):null;});
+cv.addEventListener("mousemove",e=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;if(drag){drag.x=mx;drag.y=my;drag.vx=drag.vy=0;}hover=nodeAt(mx,my);
+  $("#coord").innerHTML=`E<b>${String(Math.round(mx)).padStart(3,"0")}</b> N<b>${String(Math.round(my)).padStart(3,"0")}</b>`;
+  const tip=$("#tip");if(hover){tip.style.opacity=1;tip.style.left=(mx+14)+"px";tip.style.top=(my+8)+"px";tip.innerHTML=(hover.type==="principal"?`<b>PRINCIPAL</b> ${esc(hover.label)}`:hover.type==="func"?`<b>FUNCTION</b> ${esc(hover.label)}`:`<b>OBJECT</b> ${esc(hover.label)}`)+` · ${hover.tag}`;}else tip.style.opacity=0;});
+cv.addEventListener("mouseleave",()=>{mx=my=-99;hover=null;$("#tip").style.opacity=0;});
+
+/* ===== left bars ===== */
+let EFF={},PRIN={};
+function buildBars(snap){const be=$("#barsEff");be.innerHTML="";EFF={};(snap.catalog||[]).forEach(l=>{if(EFF[l.effect])return;EFF[l.effect]={n:0};be.appendChild(el("div","bar eff",`<div class="bl"><span>${l.effect}</span><b id="ec-${l.effect}">0</b></div><div class="bt"><div class="bf" id="ef-${l.effect}"></div></div>`));});
+  const bp=$("#barsPrin");bp.innerHTML="";PRIN={};Object.keys(snap.principals||{}).forEach(pid=>{PRIN[pid]={n:0};bp.appendChild(el("div","bar "+pid,`<div class="bl"><span>${pid==="anon"?"∅ anon":pid}</span><b id="pc-${pid}">0</b></div><div class="bt"><div class="bf" id="pf-${pid}"></div></div>`));});}
+function bumpEff(eff){if(!EFF[eff])return;EFF[eff].n++;const m=Math.max(...Object.values(EFF).map(x=>x.n),1);Object.keys(EFF).forEach(k=>{const f=$("#ef-"+k);if(f)f.style.width=(EFF[k].n/m*100)+"%";const c=$("#ec-"+k);if(c)c.textContent=EFF[k].n;});$("#lawHit").textContent=Object.values(EFF).reduce((a,b)=>a+b.n,0);}
+function bumpPrin(pid){if(!PRIN[pid])return;PRIN[pid].n++;const m=Math.max(...Object.values(PRIN).map(x=>x.n),1);Object.keys(PRIN).forEach(k=>{const f=$("#pf-"+k);if(f)f.style.width=(PRIN[k].n/m*100)+"%";const c=$("#pc-"+k);if(c)c.textContent=PRIN[k].n;});}
+
+/* ===== data flow ===== */
+function renderRun(snap){ST.snap=snap;ST.items=(snap.timeline||[]).filter(t=>t.trace);ST.started=true;resize();buildGraph(snap);buildBars(snap);alpha=1;buildStream();buildTrack();}
+async function run(){if(ST.playing)return;$("#run").disabled=true;$("#idle").style.display="none";$("#sweep").style.display="block";$("#statusTxt").textContent="SWEEP ACTIVE · demo.local";c2("hi","► sweep initiated");
+  let snap;try{snap=await (await fetch("/api/run-demo",{method:"POST"})).json();}catch(_){snap=window.__DEMO__;}if(!snap||snap.empty)snap=window.__DEMO__;
+  renderRun(snap);await play();$("#run").disabled=false;}
+async function runScan(){if(ST.playing)return;
+  const cfg=readEngagement();
+  if(!cfg.base_url||!cfg.authorized||Object.keys(cfg.principals).length===0){openEng();c2("wrn","► live sweep needs a target, ≥1 principal and the authorization box ticked");return;}
+  $("#run").disabled=true;$("#engRun").disabled=true;$("#idle").style.display="none";$("#sweep").style.display="block";
+  const hostLabel=(cfg.base_url.replace(/^https?:\/\//,"").split("/")[0])||"target";
+  $("#statusTxt").textContent="LIVE SWEEP · "+hostLabel;c2("hi","► live sweep → "+hostLabel);
+  let snap,err=null;
+  try{const r=await fetch("/api/scan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(cfg)});
+      snap=await r.json();if(!r.ok||snap.error){err=snap.error||("scan failed ("+r.status+")");}}
+  catch(e){err="could not reach the scan endpoint — is the server running?";}
+  $("#run").disabled=false;$("#engRun").disabled=false;
+  if(err){$("#sweep").style.display="none";$("#idle").style.display="";$("#statusTxt").textContent="STANDBY · SCOPE LOCKED";c2("err","✗ "+err);engMsg(err,true);return;}
+  closeEng();renderRun(snap);await play();
+  c2("ok","► live sweep complete · "+((snap.counts||{}).findings||0)+" findings");}
+async function play(){ST.playing=true;clearTriage();for(let i=0;i<ST.items.length;i++){await stepTo(i);await sleep(SPEED*0.5);}ST.playing=false;$("#now").textContent=`DONE · ${ST.snap.counts.findings} FND · ${ST.snap.counts.candidates_dropped} SUP`;$("#statusTxt").textContent="SWEEP COMPLETE";c2("ok","► sweep complete · "+ST.snap.counts.findings+" findings");}
+async function stepTo(i){ST.moment=i;const it=ST.items[i],tr=it.trace;setPlayhead(i);$("#now").textContent=`${String(i+1).padStart(2,"0")}/${ST.items.length} · ${tr.principal} ▸ ${tr.path}`;bumpPkt(8+Math.floor(Math.random()*26));bumpPrin(tr.principal);c2("inf",`▸ ${tr.principal} ${tr.method} ${tr.path}`);
+  const c=$("#c"+i);if(c){c.classList.add("shown","sel");c.scrollIntoView({block:"nearest",behavior:"smooth"});}await sleep(SPEED*0.45);
+  const st=$("#stamp"+i),out=tr.outcome,m=out==="finding"?["finding","CONFIRMED"]:out==="candidate-unconfirmed"?["dropped","SUPPRESSED"]:out==="halted"?["halt","HALTED"]:["clean","CLEAN"];
+  if(st){st.className="stamp "+m[0];st.textContent=m[1];}if(c)setTimeout(()=>c.classList.remove("sel"),SPEED*.6);
+  if(out==="finding"){const f=ST.snap.findings.find(x=>x.fid===tr.finding_id);if(f){addViolation(f);pushTriage(f);bumpEff(f.effect);hitFlash();glitch();refreshTicker([tickStr(tr.method+" "+tr.path,403)]);c2("err",`✗ FINDING ${f.fid} · ${f.effect} · Δ-confirmed`);}}
+  else if(out==="candidate-unconfirmed")c2("wrn","· candidate suppressed (no Δ-state)");else c2("ok","· clean");
+  setCountersObj(cumCounts(i));const tk=$("#tk"+i);if(tk)tk.classList.add(m[0]==="finding"?"finding":m[0]==="dropped"?"dropped":"clean");}
+function cumCounts(i){let an=0,fn=0,dr=0,cl=0;const sev={Critical:0,High:0,Medium:0,Low:0};for(let k=0;k<=i;k++){const tr=ST.items[k].trace;an++;if(tr.outcome==="finding"){fn++;const f=ST.snap.findings.find(x=>x.fid===tr.finding_id);if(f)sev[f.severity]++;}else if(tr.outcome==="candidate-unconfirmed")dr++;else cl++;}return{an,fn,dr,cl,sev};}
+function setCountersObj(c){const prec=c.fn?100:(c.an?100:0);$("#gaugeArc").style.strokeDashoffset=113-113*prec/100;$("#gNum").textContent=prec+"%";$("#gaugeNum").textContent=prec;$("#gSub").textContent=`${c.dr} SUP · 0 FP`;$("#triCnt").textContent=String(c.fn).padStart(2,"0");renderSev(c.sev);}
+function renderSev(sev){const r=$("#sevrow");r.innerHTML="";[["Critical","c"],["High","h"],["Medium","m"],["Low","l"]].forEach(([k,cl])=>{if(sev[k])r.appendChild(el("span","sv "+cl,sev[k]+" "+k.slice(0,4).toUpperCase()));});}
+function hitFlash(){const f=$("#flash");f.classList.add("hit");setTimeout(()=>f.classList.remove("hit"),130);}
+function glitch(){const v=$("#figLat");if(v){v.classList.remove("glitching");void v.offsetWidth;v.classList.add("glitching");}const t=$("#tear");t.style.top=(20+Math.random()*60)+"%";t.style.opacity=.85;setTimeout(()=>t.style.opacity=0,90);}
+
+function buildStream(){const s=$("#stream");s.innerHTML="";ST.items.forEach((it,i)=>{const tr=it.trace;const c=el("div","contact");c.id="c"+i;c.innerHTML=`<div class="ix">${String(i+1).padStart(2,"0")}</div><div class="who ${tr.principal}">${tr.principal==="anon"?"∅":tr.principal}</div><div><div class="m">${esc(tr.method+" "+tr.path)}</div><div class="d">${esc(it.label)}</div></div><div class="stamp pending" id="stamp${i}">scanning</div>`;c.onclick=()=>selectMoment(i);s.appendChild(c);});}
+function markStream(i){ST.items.forEach((it,k)=>{const c=$("#c"+k),st=$("#stamp"+k);if(!c)return;if(k<=i){c.classList.add("shown");const o=it.trace.outcome,m=o==="finding"?["finding","CONFIRMED"]:o==="candidate-unconfirmed"?["dropped","SUPPRESSED"]:o==="halted"?["halt","HALTED"]:["clean","CLEAN"];st.className="stamp "+m[0];st.textContent=m[1];}else{c.classList.remove("shown");st.className="stamp pending";st.textContent="scanning";}c.classList.toggle("sel",k===i);});}
+
+function clearTriage(){$("#tlist").innerHTML="";}
+function pushTriage(f){if($("#t"+f.fid))return;const c=el("div","trow "+f.severity);c.id="t"+f.fid;const flow=f.target==="function"?`<span class="a">${esc(f.actor)}</span> <span class="ar">▸▸</span> ${esc(shortFn(f.endpoint))}`:`<span class="a">${esc(f.actor)}</span> <span class="ar">▸▸</span> <span class="o">${esc(f.target)}</span>${(f.owner&&f.owner!==f.actor)?` <span style="color:#564448">(owner ${esc(f.owner)})</span>`:""}`;
+  c.innerHTML=`<div class="rt">${esc(f.title)}</div><div class="rm"><span>${esc(f.fid)}</span><span>${f.severity.toUpperCase()}</span></div><div class="rf">${flow}</div>`;c.onclick=()=>openProof(f.fid);$("#tlist").appendChild(c);}
+function openProof(fid){ST.sel=fid;switchView("proof");$$(".trow").forEach(x=>x.classList.toggle("sel",x.id==="t"+fid));const f=ST.snap.findings.find(x=>x.fid===fid);if(!f)return;const src=f.source==="inferred"?'<b style="color:#f5b53d">inferred</b>':'contract';
+  $("#proof").innerHTML=`<div class="pgrid"><div class="phd"><div class="pt">${esc(f.title)}</div><div class="pm"><span>${esc(f.fid)}</span><span><b>${f.severity}</b></span>${f.cvss?`<span>CVSS <b style="color:#ff5e6e">${f.cvss.score}</b> ${esc(f.cvss.label)}</span>`:""}<span>${esc(f.endpoint)}</span><span>impact: ${esc(f.impact)}</span><span>class: ${src}</span></div>${f.cvss&&f.cvss.vector?`<div class="pm" style="margin-top:2px;color:#564448"><span style="font-size:9px">${esc(f.cvss.vector)}</span></div>`:""}</div>
+    <div class="blk"><div class="bh">Δ-state · read-back as ${esc(f.owner)}</div><div class="bc diff"><div class="ln before"><span class="sign">−</span><span>${esc(f.state_proof.before)}</span></div><div class="ln after"><span class="sign">+</span><span>${esc(f.state_proof.after)}</span></div><div class="ln" style="color:#8a767a;font-size:10.5px;padding-top:8px"><span class="sign"></span><span>${esc(f.state_proof.detail)}</span></div></div></div>
+    <div class="blk"><div class="bh">causal kill-chain</div><div class="bc"><ol class="chain">${f.causal_path.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div></div>
+    <div class="blk" style="grid-column:1/-1"><div class="bh">reproduction · proof-of-concept</div><div class="bc"><div class="pocbox"><div class="pocbtns"><button class="pbtn" id="cpPoc">COPY CURL</button><button class="pbtn" id="exMd">EXPORT .md</button></div><pre>${esc(f.poc.curl.join("\n"))}\n\n# ${esc(f.poc.notes)}</pre></div></div></div></div>`;
+  $("#cpPoc").onclick=()=>{navigator.clipboard?.writeText(f.poc.curl.join("\n"));$("#cpPoc").textContent="COPIED";setTimeout(()=>$("#cpPoc").textContent="COPY CURL",1200);};
+  $("#exMd").onclick=()=>{const b=new Blob([f.report_markdown],{type:"text/markdown"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.fid+".md";a.click();};}
+
+function buildTrack(){$$(".tick,.station").forEach(x=>x.remove());const t=$("#track");ST.items.forEach((it,i)=>{const left=((i+0.5)/ST.items.length*100);const tk=el("div","tick");tk.id="tk"+i;tk.style.left=left+"%";tk.title=it.label;tk.onclick=()=>selectMoment(i);t.appendChild(tk);const stn=el("div","station",String(i+1).padStart(2,"0"));stn.style.left=left+"%";t.appendChild(stn);});}
+function setPlayhead(i){$("#playhead").style.left=((i+0.5)/ST.items.length*100)+"%";$$(".tick").forEach((x,k)=>x.classList.toggle("cur",k===i));}
+function markTicks(i){ST.items.forEach((it,k)=>{const tk=$("#tk"+k);if(!tk)return;tk.className="tick";if(k<=i){const o=it.trace.outcome;tk.classList.add(o==="finding"?"finding":o==="candidate-unconfirmed"?"dropped":"clean");}tk.classList.toggle("cur",k===i);});}
+function rebuildTo(i){buildGraph(ST.snap);buildBars(ST.snap);clearTriage();for(let k=0;k<=i;k++){const tr=ST.items[k].trace;bumpPrin(tr.principal);if(tr.outcome==="finding"){const f=ST.snap.findings.find(x=>x.fid===tr.finding_id);if(f){addViolation(f);pushTriage(f);bumpEff(f.effect);}}}setCountersObj(cumCounts(i));markStream(i);markTicks(i);alpha=1;}
+function selectMoment(i){if(ST.playing||!ST.started)return;rebuildTo(i);ST.moment=i;setPlayhead(i);const tr=ST.items[i].trace;$("#now").textContent=`SCRUB ${String(i+1).padStart(2,"0")}/${ST.items.length} · ${tr.principal} ▸ ${tr.path}`;if(tr.outcome==="finding")openProof(tr.finding_id);else switchView("stream");}
+
+function switchView(v){$$(".mtab").forEach(t=>t.classList.toggle("on",t.dataset.view===v));$$(".view").forEach(x=>x.classList.remove("on"));$("#v-"+v).classList.add("on");if(v==="lattice")resize();if(v==="diag")buildDiag();}
+$$(".mtab").forEach(t=>t.onclick=()=>switchView(t.dataset.view));
+$("#run").onclick=()=>{ (ST.mode==="live") ? runScan() : run(); };
+addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault();if(!ST.started)run();}if(e.code==="ArrowRight"&&ST.started)selectMoment(Math.min(ST.moment+1,ST.items.length-1));if(e.code==="ArrowLeft"&&ST.started)selectMoment(Math.max(ST.moment-1,0));});
+
+/* ===== workspace: pop-out / drag / resize ===== */
+let zTop=200;
+function initWorkspace(){
+  let anyFloat=false;
+  $$(".panel").forEach(p=>{
+    const ph=p.querySelector(":scope > .ph");if(!ph)return;
+    const btn=el("button","pop","⤢");btn.title="pop out / dock";ph.appendChild(btn);
+    const home={parent:p.parentNode,next:p.nextElementSibling};let floating=false;
+    btn.addEventListener("mousedown",e=>e.stopPropagation());
+    btn.onclick=e=>{e.stopPropagation();floating=!floating;floating?float():dock();};
+    function float(){const r=p.getBoundingClientRect();p.classList.add("floating");p.style.left=r.left+"px";p.style.top=r.top+"px";p.style.width=r.width+"px";p.style.height=r.height+"px";document.body.appendChild(p);bring();const rz=el("div","rz");p.appendChild(rz);makeResize(rz);btn.textContent="⤡";anyFloat=true;$("#dockall").style.display="block";fireResize();}
+    function dock(){p.classList.remove("floating");p.removeAttribute("style");const rz=p.querySelector(":scope > .rz");if(rz)rz.remove();if(home.next&&home.next.parentNode===home.parent)home.parent.insertBefore(p,home.next);else home.parent.appendChild(p);btn.textContent="⤢";fireResize();checkAny();}
+    function bring(){p.style.zIndex=++zTop;}
+    p.addEventListener("mousedown",()=>{if(p.classList.contains("floating"))bring();});
+    // header drag
+    ph.addEventListener("mousedown",e=>{if(!p.classList.contains("floating")||e.target===btn)return;e.preventDefault();bring();const r=p.getBoundingClientRect(),ox=e.clientX-r.left,oy=e.clientY-r.top;
+      const mv=ev=>{p.style.left=Math.max(0,Math.min(innerWidth-60,ev.clientX-ox))+"px";p.style.top=Math.max(0,Math.min(innerHeight-30,ev.clientY-oy))+"px";};
+      const up=()=>{removeEventListener("mousemove",mv);removeEventListener("mouseup",up);};addEventListener("mousemove",mv);addEventListener("mouseup",up);});
+    function makeResize(rz){rz.addEventListener("mousedown",e=>{e.preventDefault();e.stopPropagation();const r=p.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,sw=r.width,sh=r.height;
+      const mv=ev=>{p.style.width=Math.max(220,sw+ev.clientX-sx)+"px";p.style.height=Math.max(130,sh+ev.clientY-sy)+"px";fireResize();};
+      const up=()=>{removeEventListener("mousemove",mv);removeEventListener("mouseup",up);fireResize();};addEventListener("mousemove",mv);addEventListener("mouseup",up);});}
+    p._dock=()=>{if(p.classList.contains("floating")){floating=false;dock();}};
+  });
+  function checkAny(){const left=$$(".panel.floating").length;if(!left)$("#dockall").style.display="none";}
+  $("#dockall").onclick=()=>{$$(".panel.floating").forEach(p=>p._dock&&p._dock());$("#dockall").style.display="none";};
+}
+
+/* boot */
+
+/* ===================== DIAGNOSTICS (read-only) ===================== */
+function _pct(n,d){return d?Math.round(1000*n/d)/10:0;}
+function computeDiag(snap){
+  const c=snap.counts||{},F=snap.findings||[],T=snap.traces||[],L=snap.leads||[],
+        cat=snap.catalog||[],env=snap.envelopes||{},pr=snap.principals||{};
+  const nF=c.findings??F.length,nD=c.candidates_dropped??0,nC=c.clean??0,an=c.analyzed??T.length;
+  const cand=nF+nD;
+  const effF={};F.forEach(f=>effF[f.effect]=(effF[f.effect]||0)+1);
+  const perEff=cat.map(l=>({effect:l.effect,findings:effF[l.effect]||0,share:_pct(effF[l.effect]||0,nF),impact:l.impact||""}));
+  const covered=perEff.filter(e=>e.findings>0).length;
+  const actF={};F.forEach(f=>actF[f.actor]=(actF[f.actor]||0)+1);
+  const perPrin=Object.keys(env).map(pid=>({pid,label:(pr[pid]||{}).label||pid,anon:(pr[pid]||{}).anon||false,
+      obj:(env[pid].object_ids||[]).length,eff:(env[pid].effects||[]).length,auth:(env[pid].authority||[]).length,find:actF[pid]||0}));
+  const lk={};L.forEach(x=>lk[x.kind]=(lk[x.kind]||0)+1);
+  const ws=L.map(x=>x.weight).filter(x=>typeof x==="number");
+  const out={};T.forEach(t=>out[t.outcome]=(out[t.outcome]||0)+1);
+  const cv=F.map(f=>f.cvss&&f.cvss.score).filter(x=>typeof x==="number");
+  return{run:{analyzed:an,findings:nF,leads:L.length,candidates_dropped:nD,clean:nC,halted:c.halted||0},
+    selectivity:{candidates_raised:cand,confirm_rate_pct:_pct(nF,cand),drop_rate_pct:_pct(nD,cand),clean_pass_pct:_pct(nC,an),reported_false_positives:0},
+    severity:c.severity||{},cvss:cv.length?{n:cv.length,min:Math.min(...cv),max:Math.max(...cv),mean:Math.round(100*cv.reduce((a,b)=>a+b,0)/cv.length)/100}:{},
+    per_effect:perEff,per_principal:perPrin,
+    leads:{total:L.length,by_kind:lk,weight_min:ws.length?Math.min(...ws):0,weight_max:ws.length?Math.max(...ws):0,weight_mean:ws.length?Math.round(100*ws.reduce((a,b)=>a+b,0)/ws.length)/100:0},
+    pipeline:{outcomes:out},
+    detectors:{eil_laws:cat.length,effect_classes_total:cat.length,effect_classes_covered:covered,coverage_pct:_pct(covered,cat.length)},
+    findings_table:F.map(f=>({fid:f.fid,severity:f.severity,effect:f.effect,endpoint:f.endpoint,actor:f.actor,target:f.target,cvss:(f.cvss||{}).score,source:f.source})),
+    meta:{tool:"ONYX / AuthPath",version:"3.0-fixed",generated_at:new Date().toISOString(),source:"client-side (snapshot)"}};
+}
+let DIAG=null;
+async function buildDiag(){
+  const host=$("#diag");
+  let rep=null;
+  try{const r=await fetch("/api/diagnostics");if(r.ok){rep=await r.json();}}catch(_){}
+  if(!rep||rep.error){const snap=ST.snap||window.__DEMO__;rep=computeDiag(snap);}
+  DIAG=rep;renderDiag(rep);
+}
+function svPill(k){return{Critical:"c",High:"h",Medium:"m",Low:"l"}[k]||"l";}
+function bar(v,max,g){return `<div class="dbar ${g?'g':''}"><i style="width:${max?Math.round(100*v/max):0}%"></i></div>`;}
+function renderDiag(d){
+  const sel=d.selectivity,run=d.run,det=d.detectors;
+  const cards=[
+    ["key","FINDINGS",run.findings,"Δstate-confirmed"],
+    ["good","REPORTED FP",sel.reported_false_positives,"by construction"],
+    ["","ANALYZED",run.analyzed,"exchanges"],
+    ["","LEADS",run.leads,"ranked"],
+    ["good","Δ-DROPPED",run.candidates_dropped,sel.drop_rate_pct+"% of candidates"],
+    ["","CONFIRM RATE",sel.confirm_rate_pct+"%","of candidates"],
+    ["warn","COVERAGE",det.coverage_pct+"%",det.effect_classes_covered+"/"+det.effect_classes_total+" effect-classes"],
+    ["","EIL LAWS",det.eil_laws,"conservation laws"],
+  ].map(([k,l,n,s])=>`<div class="dcard ${k}"><div class="dl">${l}</div><div class="dn">${n}</div><div class="ds">${s}</div></div>`).join("");
+
+  const sevMax=Math.max(1,...Object.values(d.severity||{}).map(x=>x.count!==undefined?x.count:x));
+  const sevRows=[["Critical","c"],["High","h"],["Medium","m"],["Low","l"]].map(([k,cl])=>{
+    const v=(d.severity[k]&&d.severity[k].count!==undefined)?d.severity[k].count:(d.severity[k]||0);
+    return `<tr><td><span class="pill ${cl}">${k}</span></td><td>${v}</td><td>${bar(v,sevMax)}</td></tr>`;}).join("");
+
+  const effMax=Math.max(1,...d.per_effect.map(e=>e.findings));
+  const effRows=d.per_effect.map(e=>`<tr><td>${esc(e.effect)}</td><td>${e.findings}</td><td>${bar(e.findings,effMax)}</td><td style="color:#8a767a">${esc((e.impact||"").slice(0,42))}</td></tr>`).join("");
+
+  const prMax=Math.max(1,...d.per_principal.map(p=>p.obj??p.envelope_objects??0));
+  const _o=p=>p.obj??p.envelope_objects??0,_e=p=>p.eff??p.envelope_effects??0,_a=p=>p.auth??p.envelope_authority??0,_fd=p=>p.find??p.findings_as_actor??0;
+  const prRows=d.per_principal.map(p=>`<tr><td>${esc(p.pid)}${p.anon?' <span class="pill l">anon</span>':''}</td><td>${_o(p)}</td><td>${_e(p)}</td><td>${_a(p)}</td><td>${_fd(p)}</td><td>${bar(_o(p),prMax,true)}</td></tr>`).join("");
+
+  const lk=d.leads.by_kind||{};const lkMax=Math.max(1,...Object.values(lk));
+  const lkRows=Object.entries(lk).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td><td>${bar(v,lkMax)}</td></tr>`).join("")||'<tr><td colspan="3" style="color:#564448">// none</td></tr>';
+
+  const fRows=(d.findings_table||[]).map(f=>`<tr><td>${esc(f.fid)}</td><td><span class="pill ${svPill(f.severity)}">${esc((f.severity||'').slice(0,4))}</span></td><td>${esc(f.effect)}</td><td style="color:#8a767a">${esc(f.endpoint||'')}</td><td>${esc(f.actor||'')}▸${esc(String(f.target||''))}</td><td>${f.cvss??'—'}</td></tr>`).join("");
+
+  const perf=d.performance?Object.entries(d.performance).map(([k,v])=>`<tr><td>${k.replace('n_','N=')}</td><td>${v.seconds}s</td><td>${v.ms_per_request} ms/req</td></tr>`).join(''):'<tr><td colspan="3" style="color:#564448">// run via server for perf probe</td></tr>';
+
+  $("#diag").innerHTML=`
+    <div class="dgtools"><button class="dgx" id="dgExportFull" title="download the full diagnostics file for this run (metrics + nerve self-diagnosis + every raw exchange; secrets redacted, PII hashed) — the file to send back for analysis">⤓ EXPORT FULL DIAGNOSTICS</button><button class="dgx" id="dgExport" title="download the summary metrics JSON">⤓ EXPORT JSON</button><button class="dgx" id="dgBundle" title="download every confirmed finding as submission-ready HackerOne/Bugcrowd markdown (a .zip of reports + INDEX)">⤓ SUBMISSION PACK</button></div>
+    <div class="dgrid">${cards}</div>
+    <div class="dsec">SEVERITY <b>DISTRIBUTION</b></div>
+    <table class="dtbl"><tr><th>severity</th><th>n</th><th></th></tr>${sevRows}</table>
+    <div class="dsec">FINDINGS BY <b>EFFECT-CLASS</b></div>
+    <table class="dtbl"><tr><th>effect</th><th>n</th><th></th><th>impact</th></tr>${effRows}</table>
+    <div class="dsec">PRINCIPAL <b>ENVELOPES</b></div>
+    <table class="dtbl"><tr><th>pid</th><th>objects</th><th>effects</th><th>authority</th><th>findings</th><th></th></tr>${prRows}</table>
+    <div class="dsec">LEADS BY <b>KIND</b> · w[${d.leads.weight_min}–${d.leads.weight_max}] μ${d.leads.weight_mean}</div>
+    <table class="dtbl"><tr><th>kind</th><th>n</th><th></th></tr>${lkRows}</table>
+    <div class="dsec">CONFIRMED <b>FINDINGS</b></div>
+    <table class="dtbl"><tr><th>id</th><th>sev</th><th>effect</th><th>endpoint</th><th>actor▸target</th><th>cvss</th></tr>${fRows}</table>
+    <div class="dsec">PERFORMANCE <b>PROBE</b></div>
+    <table class="dtbl"><tr><th>size</th><th>time</th><th>throughput</th></tr>${perf}</table>
+    <div class="dgsrc">// source: ${esc((d.meta||{}).source||'')} · ${esc((d.meta||{}).generated_at||'')} · read-only observer</div>`;
+}
+function exportDiag(){
+  const rep=DIAG||computeDiag(ST.snap||window.__DEMO__);
+  const blob=new Blob([JSON.stringify(rep,null,2)],{type:"application/json"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  const ts=new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
+  a.href=u;a.download="onyx_diagnostics_"+ts+".json";document.body.appendChild(a);a.click();
+  a.remove();URL.revokeObjectURL(u);
+  if(typeof c2==="function")c2("ok","► diagnostics exported");
+}
+document.addEventListener("click",e=>{if(e.target&&e.target.id==="dgExport")exportDiag();});
+async function exportFull(){
+  try{
+    const r=await fetch("/api/export");
+    if(!r.ok){const j=await r.json().catch(()=>({error:"export failed"}));
+      if(typeof c2==="function")c2("err","► "+(j.error||"export failed"));return;}
+    const blob=await r.blob();
+    const cd=r.headers.get("Content-Disposition")||"";
+    const m=cd.match(/filename="([^"]+)"/);
+    const name=(m&&m[1])||("onyx_diagnostics_"+Date.now()+".json");
+    const u=URL.createObjectURL(blob);const a=document.createElement("a");
+    a.href=u;a.download=name;document.body.appendChild(a);a.click();
+    a.remove();URL.revokeObjectURL(u);
+    if(typeof c2==="function")c2("ok","► full diagnostics exported — safe to send");
+  }catch(_){if(typeof c2==="function")c2("err","► export failed (run a scan first)");}
+}
+document.addEventListener("click",e=>{if(e.target&&e.target.id==="dgExportFull")exportFull();});
+
+/* ===== ENGAGEMENT DRAWER — live target config (interface only; drives the existing engine) ===== */
+ST.mode="demo";
+const LSKEY="onyx_engagement_v2";
+const mkInput=(val,ph,cls)=>{const e=document.createElement("input");e.type="text";if(cls)e.className=cls;e.placeholder=ph||"";e.value=val||"";e.autocomplete="off";return e;};
+const mkRm=(title,fn)=>{const b=document.createElement("button");b.className="rm";b.textContent="✕";b.title=title;b.onclick=fn;return b;};
+
+function openEng(){$("#eng").classList.add("on");$("#engScrim").classList.add("on");$("#eng").setAttribute("aria-hidden","false");}
+function closeEng(){$("#eng").classList.remove("on");$("#engScrim").classList.remove("on");$("#eng").setAttribute("aria-hidden","true");}
+function engMsg(t,err){const m=$("#engMsg");if(!m)return;m.textContent=t||"";m.style.color=err?"var(--red)":"var(--dim2)";if(t)setTimeout(()=>{if(m.textContent===t)m.textContent="";},4000);}
+
+function pidList(){return [...$("#prinRows").querySelectorAll(".pid")].map(i=>i.value.trim()).filter(Boolean);}
+
+function syncEpIds(){const pids=pidList();
+  $("#epRows").querySelectorAll(".ep").forEach(ep=>{
+    const row=ep.querySelector(".idrow");
+    const keep={};row.querySelectorAll("[data-idpid]").forEach(inp=>keep[inp.dataset.idpid]=inp.value);
+    row.innerHTML="";row.style.display="flex";row.style.gap="6px";row.style.flexWrap="wrap";
+    if(!pids.length){row.innerHTML='<div class="hint" style="margin:0">add a principal to list the ids it owns</div>';return;}
+    pids.forEach(pid=>{
+      const w=el("div","",`<label class="fl">${esc(pid)} owns</label>`);w.style.flex="1";w.style.minWidth="118px";
+      const inp=document.createElement("input");inp.type="text";inp.dataset.idpid=pid;inp.placeholder="1001, 1002";
+      inp.value=keep[pid]||"";inp.autocomplete="off";inp.oninput=updateGate;
+      w.appendChild(inp);row.appendChild(w);});
+  });}
+
+function addPrinRow(pid="",cred=""){
+  let value="",type="bearer",header="";
+  if(cred&&typeof cred==="object"){value=cred.value||"";type=cred.type||"bearer";header=cred.header||"";}
+  else{value=cred||"";}
+  const wrap=el("div","row");
+  const p=mkInput(pid,"A","pid");
+  const at=document.createElement("select");at.className="atype";
+  [["bearer","Bearer"],["cookie","Cookie"],["header","Header"]].forEach(([v,l])=>{const o=document.createElement("option");o.value=v;o.textContent=l;if(v===type)o.selected=true;at.appendChild(o);});
+  const hn=mkInput(header,"X-Api-Key","hname");hn.style.display=(type==="header")?"":"none";
+  const t=mkInput(value,"paste credential value","grow");t.dataset.tok="1";t.spellcheck=false;
+  const rm=mkRm("remove principal",()=>{wrap.remove();syncEpIds();updateGate();});
+  at.onchange=()=>{hn.style.display=(at.value==="header")?"":"none";updateGate();};
+  p.oninput=()=>{syncEpIds();updateGate();};t.oninput=updateGate;hn.oninput=updateGate;
+  wrap.append(p,at,hn,t,rm);$("#prinRows").appendChild(wrap);}
+
+function addEpRow(method="GET",path="",ids={},effect="auto",body=""){
+  const ep=el("div","ep"),row=el("div","row");
+  const sel=document.createElement("select");sel.className="meth";
+  ["GET","POST","PUT","PATCH","DELETE"].forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;if(m===method)o.selected=true;sel.appendChild(o);});
+  sel.onchange=updateGate;
+  const pin=mkInput(path,"/api/orders/{id}","grow");pin.dataset.path="1";pin.spellcheck=false;pin.oninput=updateGate;
+  const rm=mkRm("remove endpoint",()=>{ep.remove();updateGate();});
+  row.append(sel,pin,rm);
+  const effrow=el("div","effrow");
+  const eff=document.createElement("select");eff.className="eff";
+  [["auto","auto · IDOR/BOLA"],["object-access","object-access"],["payment","payment"],["price","price"],["state-gate","state-gate"],["coupon","coupon"],["ownership","ownership · mass-assign"],["authority","authority · BFLA"]].forEach(([v,l])=>{const o=document.createElement("option");o.value=v;o.textContent=l;if(v===effect)o.selected=true;eff.appendChild(o);});
+  eff.onchange=updateGate;
+  const btog=el("button","bodytog","＋ body");
+  effrow.append(el("span","efflabel","effect"),eff,btog);
+  const bodywrap=el("div","bodywrap");bodywrap.style.display=body?"":"none";
+  const ta=document.createElement("textarea");ta.dataset.body="1";ta.spellcheck=false;ta.placeholder='{"amount_paid": 1.0, "amount_due": 90.0}';ta.value=body||"";ta.oninput=updateGate;
+  bodywrap.appendChild(ta);
+  if(body)btog.classList.add("on");
+  btog.onclick=()=>{const show=bodywrap.style.display==="none";bodywrap.style.display=show?"":"none";btog.classList.toggle("on",show);};
+  const idrow=el("div","idrow");
+  ep.append(row,effrow,idrow,bodywrap);$("#epRows").appendChild(ep);
+  syncEpIds();
+  Object.entries(ids||{}).forEach(([pid,arr])=>{const inp=[...idrow.querySelectorAll("[data-idpid]")].find(i=>i.dataset.idpid===pid);if(inp)inp.value=(arr||[]).join(", ");});
+}
+
+function readEngagement(){
+  const principals={};
+  $("#prinRows").querySelectorAll(".row").forEach(r=>{
+    const pid=r.querySelector(".pid").value.trim();
+    const val=(r.querySelector("[data-tok]")||{}).value; const value=(val||"").trim();
+    if(!pid||!value)return;
+    const type=(r.querySelector(".atype")||{}).value||"bearer";
+    const header=((r.querySelector(".hname")||{}).value||"").trim();
+    principals[pid]={value,type,header};
+  });
+  const tenant={};Object.keys(principals).forEach((pid,i)=>tenant[pid]="T"+(i+1));
+  const endpoints=[];
+  $("#epRows").querySelectorAll(".ep").forEach(ep=>{
+    const method=ep.querySelector(".meth").value;
+    const path=ep.querySelector("[data-path]").value.trim();
+    if(!path)return;
+    const effect=(ep.querySelector(".eff")||{}).value||"auto";
+    const ids={};ep.querySelectorAll("[data-idpid]").forEach(inp=>{const arr=inp.value.split(",").map(s=>s.trim()).filter(Boolean);if(arr.length)ids[inp.dataset.idpid]=arr;});
+    const bel=ep.querySelector("[data-body]");const body=bel?bel.value.trim():"";
+    const e={method,path,ids};if(effect&&effect!=="auto")e.effect=effect;if(body)e.body=body;
+    endpoints.push(e);
+  });
+  return {base_url:$("#fBase").value.trim(),program:$("#fProgram").value.trim(),researcher:$("#fResearcher").value.trim(),
+    principals,tenant_domains:tenant,endpoints,
+    test_resources:$("#fTestRes").value.split(",").map(s=>s.trim()).filter(Boolean),
+    dry_run:$("#fDry").checked,authorized:$("#fAuth").checked};
+}
+
+function hostOf(u){try{return new URL(u.includes("://")?u:"http://"+u).host;}catch(e){return "";}}
+function updateGate(){
+  const cfg=readEngagement();
+  const hasPrin=Object.keys(cfg.principals).length>0;
+  const ok=!!cfg.base_url && cfg.authorized && hasPrin && cfg.endpoints.length>0;
+  $("#engRun").disabled=!ok;
+  $("#tgtbtn").classList.toggle("armed",!!cfg.base_url && hasPrin);
+  const h=hostOf(cfg.base_url);$("#engHost").textContent=h?("▸ "+h):"no target set";
+}
+
+function saveEngagement(){
+  const cfg=readEngagement();const keepTok=$("#fSaveTokens").checked;
+  const store=JSON.parse(JSON.stringify(cfg));
+  if(!keepTok)Object.keys(store.principals).forEach(p=>{if(store.principals[p]&&typeof store.principals[p]==="object")store.principals[p].value="";});
+  store._saveTokens=keepTok;store.authorized=false;
+  try{localStorage.setItem(LSKEY,JSON.stringify(store));engMsg("saved "+(keepTok?"(with credentials)":"(structure only)"));}
+  catch(e){engMsg("could not save to this browser",true);}
+}
+function loadEngagement(){try{const raw=localStorage.getItem(LSKEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
+
+/* ---- cURL import: paste a browser "copy as cURL" and autofill ---- */
+function parseCurl(text){
+  const s=String(text).replace(/\\\r?\n/g," ").trim();
+  const toks=[];let cur="",q=null;
+  for(let i=0;i<s.length;i++){const ch=s[i];
+    if(q){if(ch===q)q=null;else cur+=ch;}
+    else if(ch==="'"||ch==='"')q=ch;
+    else if(/\s/.test(ch)){if(cur){toks.push(cur);cur="";}}
+    else cur+=ch;}
+  if(cur)toks.push(cur);
+  let url="",method="",body="";const headers=[];
+  for(let i=0;i<toks.length;i++){const t=toks[i];
+    if(t==="curl")continue;
+    else if(t==="-X"||t==="--request")method=(toks[++i]||"").toUpperCase();
+    else if(t==="-H"||t==="--header")headers.push(toks[++i]||"");
+    else if(t==="-d"||t==="--data"||t==="--data-raw"||t==="--data-binary"||t==="--data-ascii")body=toks[++i]||"";
+    else if(t==="--url")url=toks[++i]||"";
+    else if(/^https?:\/\//i.test(t)&&!url)url=t;}
+  if(!method)method=body?"POST":"GET";
+  return {url,method,body,headers};
+}
+function templatize(path){
+  const parts=path.split("/");
+  for(let k=parts.length-1;k>=0;k--){
+    if(/^[0-9]+$/.test(parts[k])||/^[0-9a-f]{8}-[0-9a-f]{4}/i.test(parts[k])){const id=parts[k];parts[k]="{id}";return {tmpl:parts.join("/")||"/",id};}
+  }
+  return {tmpl:path,id:""};
+}
+function nextPid(){const used=new Set(pidList());for(const c of "ABCDEFGHIJK")if(!used.has(c))return c;return "P"+(pidList().length+1);}
+function applyCurl(){
+  const parsed=parseCurl($("#curlIn").value);
+  if(!parsed.url){engMsg("no URL found in that cURL",true);return;}
+  let u;try{u=new URL(parsed.url);}catch(e){engMsg("could not parse the URL",true);return;}
+  $("#fBase").value=u.origin;
+  const {tmpl,id}=templatize(u.pathname);
+  // credential from headers
+  let cred=null;
+  for(const h of parsed.headers){const ix=h.indexOf(":");if(ix<0)continue;const k=h.slice(0,ix).trim(),v=h.slice(ix+1).trim();const kl=k.toLowerCase();
+    if(kl==="authorization"){cred=/^bearer\s/i.test(v)?{value:v.replace(/^bearer\s+/i,""),type:"bearer",header:""}:{value:v,type:"authorization",header:""};break;}
+    if(kl==="cookie"){cred={value:v,type:"cookie",header:""};break;}
+    if(kl==="x-api-key"||kl==="api-key"||kl==="x-auth-token"){cred={value:v,type:"header",header:k};break;}
+  }
+  let pid=nextPid();
+  if(cred){addPrinRow(pid,cred);} else {pid=pidList()[0]||"";}
+  const ids=(id&&pid)?{[pid]:[id]}:{};
+  addEpRow(parsed.method,tmpl,ids,"auto",parsed.body||"");
+  syncEpIds();updateGate();
+  $("#curlBox").style.display="none";$("#curlIn").value="";
+  engMsg("imported "+parsed.method+" "+tmpl);
+}
+
+/* ---- connection test: verify each credential reaches the target ---- */
+async function pingCreds(){
+  const cfg=readEngagement();const out=$("#pingOut");
+  if(!cfg.base_url||Object.keys(cfg.principals).length===0){out.innerHTML='<div class="hint" style="margin:0;color:var(--red)">set a base URL and at least one principal first</div>';return;}
+  out.innerHTML='<div class="hint" style="margin:0">testing…</div>';
+  try{
+    const r=await fetch("/api/ping",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(cfg)});
+    const j=await r.json();
+    if(!r.ok||j.error){out.innerHTML='<div class="hint" style="margin:0;color:var(--red)">'+esc(j.error||"connection failed")+'</div>';return;}
+    out.innerHTML="";
+    Object.entries(j.results).forEach(([pid,res])=>{
+      const row=el("div","pingrow "+(res.ok?"ok":"bad"));
+      row.innerHTML=`<span class="pd"></span><span class="pp">${esc(pid)}</span><span class="ps">${res.status!=null?("HTTP "+res.status):esc(res.error||"no response")}</span><span class="pm">${res.ms}ms</span>`;
+      out.appendChild(row);
+    });
+  }catch(_){out.innerHTML='<div class="hint" style="margin:0;color:var(--red)">could not reach the scan server</div>';}
+}
+
+async function exportPack(){
+  if(!ST.started){c2("wrn","► run a scan first — nothing to package yet");return;}
+  try{
+    const r=await fetch("/api/report-bundle",{method:"POST"});
+    if(!r.ok){const j=await r.json().catch(()=>({error:"no confirmed findings"}));c2("err","► "+(j.error||"no confirmed findings to package"));return;}
+    const blob=await r.blob();const cd=r.headers.get("Content-Disposition")||"";const m=cd.match(/filename="([^"]+)"/);
+    const name=(m&&m[1])||("onyx_submission_"+Date.now()+".zip");
+    const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
+    c2("ok","► submission pack exported · "+name);
+  }catch(_){c2("err","► could not build the submission pack");}
+}
+document.addEventListener("click",e=>{if(e.target&&(e.target.id==="dgBundle"||e.target.id==="triPack"))exportPack();});
+
+/* ---- severity filter on the triage ledger ---- */
+function initSevFilter(){
+  const tlist=$("#tlist");if(!tlist||$(".sevfilter"))return;
+  const bar=el("div","sevfilter");
+  [["all","all"],["Critical","crit"],["High","high"],["Medium","med"],["Low","low"]].forEach(([v,l],i)=>{
+    const c=el("div","sf"+(i===0?" on":""),l);c.dataset.sev=v;
+    c.onclick=()=>{$$(".sevfilter .sf").forEach(x=>x.classList.toggle("on",x===c));if(v==="all")delete tlist.dataset.sev;else tlist.dataset.sev=v;};
+    bar.appendChild(c);
+  });
+  tlist.parentNode.insertBefore(bar,tlist);
+}
+
+/* wiring */
+$$(".modepick .mp").forEach(mp=>mp.onclick=()=>{
+  ST.mode=mp.dataset.mode;
+  $$(".modepick .mp").forEach(x=>x.classList.toggle("on",x===mp));
+  $("#run").textContent=(ST.mode==="live")?"LIVE":"INITIATE";
+  if(ST.mode==="live"&&!ST.started)openEng();
+});
+$("#tgtbtn").onclick=openEng;$("#engClose").onclick=closeEng;$("#engScrim").onclick=closeEng;
+$("#addPrin").onclick=()=>{addPrinRow();updateGate();};
+$("#addEp").onclick=()=>{addEpRow();updateGate();};
+$("#engSave").onclick=saveEngagement;
+$("#engPing").onclick=pingCreds;
+$("#engCurl").onclick=()=>{const b=$("#curlBox");b.style.display=b.style.display==="none"?"":"none";if(b.style.display!=="none")$("#curlIn").focus();};
+$("#curlDo").onclick=applyCurl;
+$("#curlCancel").onclick=()=>{$("#curlBox").style.display="none";$("#curlIn").value="";};
+$("#engRun").onclick=()=>{
+  ST.mode="live";$$(".modepick .mp").forEach(x=>x.classList.toggle("on",x.dataset.mode==="live"));$("#run").textContent="LIVE";
+  runScan();
+};
+["fBase","fProgram","fResearcher","fTestRes"].forEach(id=>{const e=$("#"+id);if(e)e.addEventListener("input",updateGate);});
+["fDry","fAuth","fSaveTokens"].forEach(id=>{const e=$("#"+id);if(e)e.addEventListener("change",updateGate);});
+addEventListener("keydown",e=>{if(e.key==="Escape")closeEng();if((e.key==="t"||e.key==="T")&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){e.preventDefault();$("#eng").classList.contains("on")?closeEng():openEng();}});
+
+(function initEng(){
+  initSevFilter();
+  const s=loadEngagement();
+  if(s){
+    $("#fBase").value=s.base_url||"";$("#fProgram").value=s.program||"";$("#fResearcher").value=s.researcher||"";
+    $("#fTestRes").value=(s.test_resources||[]).join(", ");$("#fDry").checked=s.dry_run!==false;$("#fSaveTokens").checked=!!s._saveTokens;
+    const pr=s.principals||{},pids=Object.keys(pr);
+    if(pids.length)pids.forEach(pid=>addPrinRow(pid,pr[pid]||""));else{addPrinRow("A");addPrinRow("B");}
+    const eps=s.endpoints||[];
+    if(eps.length)eps.forEach(ep=>addEpRow(ep.method||"GET",ep.path||"",ep.ids||{},ep.effect||"auto",ep.body||""));else addEpRow("GET","/api/orders/{id}",{});
+  }else{addPrinRow("A");addPrinRow("B");addEpRow("GET","/api/orders/{id}",{});}
+  updateGate();
+})();
+
+(function boot(){const seed=window.__DEMO__;resize();if(seed){buildGraph(seed);buildBars(seed);}alpha=1;loop();initWorkspace();})();
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "gate": "GROUND-1 catalog",
+    "source": "OWASP API Security Top 10 (2023)",
+    "blindness": "written from the attacker's external view of HTTP only; NO ONYX detection file was opened while writing this (see _catalog_started_at.txt). Forms are chosen to include shapes the tool was NOT built on (GT3 generalization).",
+    "rule": "each class lists the conserved principle it breaks and what an attacker observes on the wire — never how any tool detects it."
+  },
+  "classes": [
+    {
+      "id": "BOLA",
+      "owasp": "API1:2023 Broken Object Level Authorization",
+      "principle_broken": "an object belongs to a principal; only that principal (or an authorized role) may read/affect it",
+      "attacker_observable": "request an object id that belongs to another user; the server returns that other user's object data instead of 403/404",
+      "forms": [
+        {"form": "familiar", "name": "sequential id swap", "how": "GET /api/users/{id}/profile with another user's numeric id returns their profile"},
+        {"form": "strange", "name": "ownership via nested body reference", "how": "POST /api/transfer with {from_account: <victim_account_uuid>} executes against the victim's account though the path looks self-scoped"},
+        {"form": "strange", "name": "ownership via secondary key", "how": "GET /api/orders?invoice=<victim_invoice_code> returns the victim's order; the owning key is a query param, not a path id"}
+      ]
+    },
+    {
+      "id": "BFLA",
+      "owasp": "API5:2023 Broken Function Level Authorization",
+      "principle_broken": "a function/action is gated to a role; a principal without the role may not invoke it",
+      "attacker_observable": "a lower-privilege principal invokes an admin/elevated action (different verb or endpoint) and it executes (2xx + state change) instead of 403",
+      "forms": [
+        {"form": "familiar", "name": "method escalation", "how": "a normal user sends DELETE /api/posts/{id} on a post they do not own and it succeeds"},
+        {"form": "strange", "name": "shadow admin endpoint", "how": "a normal user POSTs /api/internal/users/{id}/role {role:'admin'} — the admin path is not linked anywhere but is reachable and executes"},
+        {"form": "strange", "name": "verb-tunneled action", "how": "action smuggled via X-HTTP-Method-Override: DELETE on a POST request bypasses the function gate"}
+      ]
+    },
+    {
+      "id": "BOPLA",
+      "owasp": "API3:2023 Broken Object Property Level Authorization",
+      "principle_broken": "within an object, specific properties are readable/writable only by authorized principals (excessive data exposure + mass assignment)",
+      "attacker_observable": "READ: a principal receives a property the server should hide from them (it appears for an admin/owner but is also returned to them in some view). WRITE: a principal sets a protected property via mass-assignment and the server accepts it",
+      "forms": [
+        {"form": "familiar", "name": "excessive field in detail view", "how": "GET on an object returns a sensitive field (e.g. credit balance) to a non-owner that the list view hides"},
+        {"form": "strange", "name": "inconsistent projection across representations", "how": "the summary endpoint hides the field but ?expand=full or a sibling endpoint leaks it for the same non-owner"},
+        {"form": "strange", "name": "mass-assignment privilege write", "how": "PATCH /api/me {is_admin:true} or {wallet_balance:99999} is silently accepted and reflected on re-read"}
+      ]
+    },
+    {
+      "id": "AUTHN_GAP",
+      "owasp": "API2:2023 Broken Authentication / unrestricted access",
+      "principle_broken": "an endpoint that exposes private data must require a valid principal; anonymous access must be denied",
+      "attacker_observable": "remove the token entirely (anonymous) and a private resource still returns 2xx with data instead of 401",
+      "forms": [
+        {"form": "familiar", "name": "missing auth on private GET", "how": "GET /api/users/{id}/private with no Authorization header returns data"},
+        {"form": "strange", "name": "auth required on one method only", "how": "GET requires auth but HEAD/OPTIONS or a cached variant leaks the same data unauthenticated"}
+      ]
+    }
+  ],
+  "decoys": {
+    "_purpose": "legitimate differences that MUST be abstained on; an alert here is a false positive = measured precision loss",
+    "items": [
+      {"name": "feature_flag_same_role", "how": "two same-role users differ on a beta field driven by an A/B flag, not authorization"},
+      {"name": "null_not_forbidden", "how": "a field is absent for a user simply because it has no value, not because it is withheld"},
+      {"name": "plan_tier_legit", "how": "a 'premium' field differs by subscription tier the user legitimately holds — a declared, correct difference"},
+      {"name": "not_found_vs_forbidden", "how": "404 for a non-existent object (no ownership claim) must never be read as a denial-of-access signal"},
+      {"name": "correct_owner_denial", "how": "a non-owner correctly receiving 403 — the right behavior, must not be flagged"}
+    ]
+  }
+}

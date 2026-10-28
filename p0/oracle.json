@@ -1,0 +1,99 @@
+{
+  "schema_version": "p0-oracle/1.0",
+  "target": "OWASP crAPI",
+  "target_provenance": "third_party",
+  "ground_truth_source": "https://owasp.org/crAPI/docs/challenges.html (crAPI authors, not ONYX)",
+  "note": "Ground truth is derived from crAPI's OWN published challenge docs and locked (hash-sealed) BEFORE any ONYX run. It declares only the authorization challenges in ONYX's domain and honestly cedes the rest. Each known_vuln is a true positive (crAPI is intentionally vulnerable); each known_clean is a legitimate access that must NOT be flagged.",
+
+  "known_vulns": [
+    {
+      "id": "BOLA-VEHICLE-LOCATION",
+      "effect": "OBJECT_ACCESS",
+      "endpoint": "GET /identity/api/v2/vehicle/{vehicleId}/location",
+      "owasp_api": "API1:2023",
+      "description": "A user can read another user's vehicle GPS location by supplying a vehicle UUID they do not own.",
+      "attacker": "B",
+      "victim_resource": "A.vehicleId"
+    },
+    {
+      "id": "BOLA-MECHANIC-REPORT",
+      "effect": "OBJECT_ACCESS",
+      "endpoint": "GET /workshop/api/mechanic/mechanic_report?report_id={id}",
+      "owasp_api": "API1:2023",
+      "description": "Mechanic report IDs are sequential and unauthenticated; a user can read other users' reports by changing report_id.",
+      "attacker": "B",
+      "victim_resource": "A.report_id"
+    },
+    {
+      "id": "BOPLA-VIDEO-INTERNAL-FIELD",
+      "effect": "FIELD_PROJECTION",
+      "endpoint": "GET /identity/api/v2/user/videos/{videoId}",
+      "owasp_api": "API3:2023",
+      "description": "The video resource exposes an internal property that should not be visible to the user (excessive data exposure).",
+      "attacker": "B",
+      "victim_resource": "B.videoId.internalField"
+    },
+    {
+      "id": "BFLA-ADMIN-DELETE-VIDEO",
+      "effect": "AUTHORITY",
+      "endpoint": "DELETE /identity/api/v2/admin/videos/{videoId}",
+      "owasp_api": "API5:2023",
+      "description": "A non-admin user can reach an admin-only endpoint to delete videos (function-level authorization).",
+      "attacker": "B",
+      "victim_resource": "admin.deleteVideo"
+    },
+    {
+      "id": "BOPLA-ORDER-MASS-ASSIGN-STATUS",
+      "effect": "OWNERSHIP",
+      "endpoint": "POST /workshop/api/shop/orders/{orderId}",
+      "owasp_api": "API3:2023",
+      "description": "The order object accepts a client-supplied `status` field; changing 'delivered' to 'returned' yields an unwarranted refund (mass assignment).",
+      "attacker": "B",
+      "victim_resource": "B.orderId.status"
+    }
+  ],
+
+  "known_clean": [
+    {
+      "id": "CLEAN-OWN-VEHICLE-LOCATION",
+      "effect": "OBJECT_ACCESS",
+      "endpoint": "GET /identity/api/v2/vehicle/{vehicleId}/location",
+      "description": "A user reading the location of THEIR OWN vehicle — a legitimate 200 a status/length heuristic would also flag.",
+      "actor": "A",
+      "resource": "A.vehicleId"
+    },
+    {
+      "id": "CLEAN-OWN-MECHANIC-REPORT",
+      "effect": "OBJECT_ACCESS",
+      "endpoint": "GET /workshop/api/mechanic/mechanic_report?report_id={id}",
+      "description": "A user reading their OWN mechanic report.",
+      "actor": "A",
+      "resource": "A.report_id"
+    },
+    {
+      "id": "CLEAN-OWN-ORDER-READ",
+      "effect": "OBJECT_ACCESS",
+      "endpoint": "GET /workshop/api/shop/orders/{orderId}",
+      "description": "A user reading their OWN order details (no status mutation).",
+      "actor": "B",
+      "resource": "B.orderId"
+    },
+    {
+      "id": "CLEAN-OWN-PROFILE",
+      "effect": "FIELD_PROJECTION",
+      "endpoint": "GET /identity/api/v2/user/dashboard",
+      "description": "A user reading their OWN dashboard/profile — rich shape by design, not a leak.",
+      "actor": "A",
+      "resource": "A.profile"
+    }
+  ],
+
+  "ceded": [
+    {"class": "SSRF", "crapi": "Challenge 11 (HTTP call to google.com)", "reason": "not an authorization decision"},
+    {"class": "JWT forge / Broken Authentication", "reason": "auth/crypto, not authorization-by-Δstate"},
+    {"class": "NoSQL injection (coupon)", "reason": "injection, out of scope"},
+    {"class": "Chatbot prompt injection", "reason": "LLM/client-side, out of scope"},
+    {"class": "Layer-7 DoS (number_of_repeats)", "reason": "resource consumption, not authorization"},
+    {"class": "Password-reset OTP brute force", "reason": "brute force, not a Δstate authorization differential"}
+  ]
+}

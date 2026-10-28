@@ -1,0 +1,8 @@
+# AuthPath v3 — runtime dependencies
+#
+# The engine, control-center server, dashboard and offline harness use ONLY the
+# Python standard library. There is nothing to install to run `serve` or `demo`.
+#
+# `requests` is needed ONLY for the live `scan` command (HTTPTarget) against a
+# real authorised target.
+requests>=2.31 ; extra == "live"

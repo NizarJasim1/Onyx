@@ -1,0 +1,53 @@
+{
+  "_base_url": "http://127.0.0.1:8920",
+  "_seed": 99,
+  "decoys": {
+    "decoy_correct_denial": {
+      "class": "DECOY",
+      "form": "correct_owner_denial",
+      "resource": "doc:4"
+    },
+    "decoy_feature_flag": {
+      "class": "DECOY",
+      "form": "feature_flag_same_role",
+      "resource": "order:4"
+    },
+    "decoy_plan_tier": {
+      "class": "DECOY",
+      "form": "plan_tier_legit",
+      "resource": "acct:1"
+    }
+  },
+  "planted": {
+    "authn_anon_read": {
+      "class": "AUTHN_GAP",
+      "form": "familiar",
+      "resource": "acct:3"
+    },
+    "bfla_method_escalation": {
+      "class": "BFLA",
+      "form": "familiar",
+      "resource": "doc:2"
+    },
+    "bola_idswap": {
+      "class": "BOLA",
+      "form": "familiar",
+      "resource": "doc:3"
+    },
+    "bola_secondary_key": {
+      "class": "BOLA",
+      "form": "strange",
+      "resource": "order:3"
+    },
+    "bopla_field_leak": {
+      "class": "BOPLA",
+      "form": "familiar",
+      "resource": "doc:1"
+    },
+    "bopla_inconsistent_projection": {
+      "class": "BOPLA",
+      "form": "strange",
+      "resource": "acct:4"
+    }
+  }
+}

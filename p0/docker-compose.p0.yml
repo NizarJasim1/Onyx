@@ -1,0 +1,14 @@
+# P0 target: OWASP crAPI, unmodified, from the official deploy compose.
+# This file documents how the operator brings up the independent target.
+#
+#   curl -o docker-compose.yml \
+#     https://raw.githubusercontent.com/OWASP/crAPI/main/deploy/docker/docker-compose.yml
+#   docker compose -f docker-compose.yml --compatibility up -d
+#
+# crAPI then serves on http://localhost:8888 ; MailHog (for signup PINs) on :8025.
+# We deliberately pull crAPI as-is so the target's authors remain independent of ONYX.
+version: "3"
+services:
+  crapi:
+    image: docker.io/crapi/crapi-web   # placeholder; real bring-up is the upstream compose
+    ports: ["8888:80"]

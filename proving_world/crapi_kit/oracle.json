@@ -1,0 +1,10 @@
+{
+  "_comment": "Ground truth = OWASP crAPI documented challenges (authored by crAPI, not by ONYX). Verify each against https://github.com/OWASP/crAPI challenge list. Keys must match the endpoint strings ONYX prints in its scorecard.",
+  "GET /identity/api/v2/vehicle/{id}/location": true,
+  "GET /workshop/api/mechanic/mechanic_report": true,
+  "POST /workshop/api/shop/orders/{id}": true,
+  "DELETE /identity/api/v2/admin/videos/{id}": true,
+  "GET /community/api/v2/community/posts/recent": true,
+  "GET /identity/api/v2/user/dashboard": false,
+  "GET /workshop/api/shop/products": false
+}

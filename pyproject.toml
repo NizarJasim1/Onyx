@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "authpath"
+version = "3.2.0"
+description = "ONYX: black-box authorization testing for web APIs that confirms every finding with a state read-back"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Nizar Jasim Mohammed Al-Zubaidi" }]
+keywords = ["security", "authorization", "idor", "bola", "bfla", "mass-assignment", "api-security", "pentesting", "bug-bounty"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/NizarJasim1/onyx"
+Issues = "https://github.com/NizarJasim1/onyx/issues"
+Changelog = "https://github.com/NizarJasim1/onyx/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+live = ["requests>=2.31"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+authpath = "authpath.cli:main"
+
+[tool.setuptools]
+packages = ["authpath"]
+
+[tool.pytest.ini_options]
+# The canonical gate is `python tests/run_all.py` (stdlib-only). This block lets
+# `pytest` also resolve imports for anyone who prefers it.
+pythonpath = [".", "tests"]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
