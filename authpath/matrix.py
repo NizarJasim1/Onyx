@@ -19,7 +19,7 @@ on a secure target every generated pair is denied and confirmed as no-leak.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 # privilege tiers (higher number = more privilege). Unknown roles -> SAME tier.
 _TIER = {

@@ -30,7 +30,7 @@ The synthetic root container is recorded under "$".
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Optional
 
 

@@ -254,7 +254,7 @@ def _verify_chain(steps: list, claim: dict):
     if len(fields) != len(carry):
         return (False, "abstain", "carried_fields count must match the carry_source steps")
     nexts = carry[1:] + [attack]                       # each hop links into the next step
-    for i, (hop, nxt) in enumerate(zip(carry, nexts)):
+    for i, (hop, nxt) in enumerate(zip(carry, nexts, strict=False)):
         v = _extract((hop.get("response") or {}).get("body"), fields[i])
         if v is None:
             return (False, "abstain", f"no carried value at hop {i} (field {fields[i]!r})")

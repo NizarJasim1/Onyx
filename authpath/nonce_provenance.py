@@ -62,7 +62,7 @@ verdict is exact string containment (RL1/RL2 deterministic).
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass, field as dc_field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Iterable, Optional
 
@@ -227,7 +227,7 @@ class NonceSeeker:
     def seek(self, channel_payload: Any, channel: str = "readback") -> Optional[AttributionResult]:
         """Return an AttributionResult for the FIRST planted nonce that appears
         exactly in `channel_payload`, else None. Exact-match only (P-1)."""
-        for token, n in self._planted.items():
+        for _token, n in self._planted.items():
             if n.appears_in(channel_payload):
                 return AttributionResult(True, PlantStrategy.PURE_TEXT, n,
                                          f"exact nonce match in {channel}", channel)

@@ -64,7 +64,6 @@ def test_rl23_cross_principal_write_confirms_and_is_fp_safe():
     e.xprincipal_write = True
 
     def ex(pid, m, b=None):
-        st, bd = None, None
         r = T().send(HTTPRequest(m, "/order/1", body=b, host="h"), P[pid])
         return Exchange(request=HTTPRequest(m, "/order/1", body=b, host="h"),
                         response=r, principal=P[pid])

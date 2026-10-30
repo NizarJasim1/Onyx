@@ -45,11 +45,11 @@ def infer_producer_consumer(openapi_spec):
     paths = (openapi_spec or {}).get("paths", {}) if isinstance(openapi_spec, dict) else {}
     for c_path, c_item in paths.items():
         cparams = _path_param_names(c_path)
-        for c_verb, c_op in _ops(c_item):
+        for c_verb, _c_op in _ops(c_item):
             for p_path, p_item in paths.items():
                 if p_path == c_path:
                     continue
-                for p_verb, p_op in _ops(p_item):
+                for p_verb, _p_op in _ops(p_item):
                     if p_verb not in ("POST", "PUT"):
                         continue
                     # consumer references an id in its path that a producer creates

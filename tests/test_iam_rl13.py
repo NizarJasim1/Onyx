@@ -155,6 +155,6 @@ def test_non_iam_traffic_never_triggers_grant_law():
     t = Plain()
     eng = _engine(t)
     ex = make_exchange(t, HTTPRequest("POST", "/api/items", body={"name": "x"}, host="h"), A)
-    tr = eng.analyze(ex)
+    eng.analyze(ex)
     # whatever the outcome, it is NOT an IAM-escalation finding
     assert not any(getattr(f, "impact", None) and "IAM" in f.impact.value for f in eng.findings)

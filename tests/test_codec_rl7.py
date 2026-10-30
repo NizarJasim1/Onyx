@@ -14,8 +14,7 @@ silent false-clean) before RL7. Properties under guard:
   5. RESOURCE  — composite resource names yield a primary id + parent chain.
 """
 from authpath.codec import (
-    normalize_body, is_opaque, parse_resource_name,
-    _decode_protobuf, _try_grpc_web,
+    normalize_body, is_opaque, _decode_protobuf,
 )
 from authpath.provenance import extract_values
 from authpath.models import HTTPRequest, HTTPResponse, Exchange, Principal

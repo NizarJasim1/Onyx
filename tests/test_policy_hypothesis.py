@@ -116,7 +116,6 @@ def test_gapA_with_hypothesis_only_breach_flagged():
 def test_gapF_cross_domain_write_routes_through_the_gate():
     # verify the gate governs writes too: a same-domain write is suppressed, a
     # cross-domain write is emitted. We assert the single choke point covers RL23.
-    from authpath.policy import PolicyHypothesis
     h = _flat()
     for r, who in (("doc_a", "A"), ("doc_b", "B"), ("doc_c", "C")):
         h.observe_owner(who, r)

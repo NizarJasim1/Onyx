@@ -177,9 +177,9 @@ class PoCEmitter:
                 f"(rank {ev.get('acting_rank')}) on family {ev.get('family')}."
             )
             steps.append(
-                f"Gate 2 (dimensional control): a genuinely lower-privilege principal "
-                f"does NOT receive this shape — so the richness is authorization-driven, "
-                f"not object-driven or by-design."
+                "Gate 2 (dimensional control): a genuinely lower-privilege principal "
+                "does NOT receive this shape — so the richness is authorization-driven, "
+                "not object-driven or by-design."
             )
             steps.append(
                 f"Gate 3 (functional anchor): privileged-only path(s) "

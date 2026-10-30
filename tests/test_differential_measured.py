@@ -10,7 +10,7 @@ import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from authpath.differential import (measure, standard_suite, response_diff_oracle,
-                                   onyx_delta_state_oracle, Scenario)
+                                   onyx_delta_state_oracle)
 
 
 def test_g4_onyx_is_precision_1_and_full_recall_on_the_suite():

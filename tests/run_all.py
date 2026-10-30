@@ -3,7 +3,7 @@
 is too). Collects every test_* function from tests/test_*.py, runs it, and exits
 non-zero on ANY failure or import error. This is the CI gate; `pytest` also works
 (see conftest.py) for anyone who prefers it."""
-import os, sys, importlib.util, traceback
+import os, sys, importlib.util
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)

@@ -8,7 +8,7 @@ that binds arbitrary body fields stands in for a vulnerable API.
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from authpath.models import HTTPRequest, HTTPResponse, Principal
+from authpath.models import HTTPResponse, Principal
 from authpath.act_bridge import ActBridge
 from authpath.nonce_provenance import NonceAuthority, NonceSeeker
 
@@ -16,8 +16,7 @@ from authpath.nonce_provenance import NonceAuthority, NonceSeeker
 class _Scope:
     class _V:
         from authpath.scope_guard import ScopeVerdict as _SV
-        verdict = _SV.PROCEED if hasattr(_SV := __import__("authpath.scope_guard",
-                  fromlist=["ScopeVerdict"]).ScopeVerdict, "PROCEED") else list(_SV)[0]
+        verdict = _SV.PROCEED if hasattr(_SV, "PROCEED") else list(_SV)[0]
     def may_mutate(self, req):
         return _Scope._V()
 

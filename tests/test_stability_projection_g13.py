@@ -113,7 +113,6 @@ def test_s5_never_votes_on_nothing():
 
 def test_default_off_is_byte_identical():
     """strip=False must behave exactly like the pre-G13 key (full body)."""
-    from authpath.confirmer import Confirmer as DC
     c = _mk(_Target({"ssn": "S"}, volatile=False), k=3, strip=False)
     r = c._stable_send(_req(), Principal("p", "p"))
     assert r is not None and r.body.get("ssn") == "S"

@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from authpath.mass_assign import role_tied_privileged_fields
 from authpath.act_bridge import ActBridge
 from authpath.scope_guard import ScopeGuard, ScopeConfig
-from authpath.models import HTTPRequest, HTTPResponse, Principal
+from authpath.models import HTTPResponse, Principal
 
 
 # ---- candidate selection -----------------------------------------------------------

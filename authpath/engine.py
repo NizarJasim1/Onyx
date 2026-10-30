@@ -566,7 +566,6 @@ class AuthPathEngine:
         contained and cannot perturb the live pipeline (separate channel)."""
         try:
             from .surface_map import identify
-            from .attestation import _scalar_fields
             ch = self._bva_channel()
             fp = ex.principal.pid
             ch["attest"].record_self_response(fp, ex.request, ex.response)
@@ -1724,7 +1723,7 @@ class AuthPathEngine:
         for body in (getattr(readback, "body", None), ex.response.body):
             if not isinstance(body, dict):
                 continue
-            for key, val in _flat_kv(body):
+            for _key, val in _flat_kv(body):
                 if not isinstance(val, str):
                     continue
                 if "@" not in val:                       # identity anchor: an email
@@ -1787,7 +1786,7 @@ class AuthPathEngine:
         if not isinstance(body, (dict, list)):
             return
         from .confirmer import _value_is_discriminating, _declares_grant_to
-        from .provenance import classify_field, ValueClass
+        from .provenance import classify_field
         from .models import (StateProof, EffectClassification, ClassificationSource,
                              Candidate, LawVerdict, Verdict)
         actor = ex.principal.pid
@@ -2126,10 +2125,9 @@ class AuthPathEngine:
         if not rtype:
             return
         door = ex.request.endpoint_key()
-        actor = ex.principal.pid
         elements = list(_iter_elements_with_ids(body))
         family_size = len(elements)
-        for elem, eid in elements:
+        for _elem, eid in elements:
             nid = _normalise_id(eid)
             if nid is None:
                 continue

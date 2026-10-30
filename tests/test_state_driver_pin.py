@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from authpath.state_driver import (
-    DrivePlan, LawStatePlanner, Primitive, required_facts_from_prior_state,
+    LawStatePlanner, Primitive, required_facts_from_prior_state,
 )
 from authpath.state_pin import DriveStabilityGuard, OwnershipLedger, Pin
 

@@ -37,7 +37,7 @@ is the most dangerous, and is held to the strictest bar:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 

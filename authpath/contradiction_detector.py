@@ -90,7 +90,6 @@ one per underlying fact instead of one per reporting layer.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
 
 # Declared dependency graph. A layer's reports cannot corroborate a layer it
 # consumes, or one that consumes it — that is one measurement echoed.

@@ -423,7 +423,7 @@ def ingest_har(har: dict, scope, in_scope_hosts: list[str] | None = None,
     finding is structurally impossible here — which is exactly correct (RL5)."""
     from .engine import AuthPathEngine
     from .transport import ReplayTarget
-    from .intrinsic import Lead, LeadKind, Confidence
+    from .intrinsic import Lead, Confidence
 
     principals, exchanges = parse_har_exchanges(har, in_scope_hosts)
     target = ReplayTarget(exchanges)
@@ -504,7 +504,7 @@ def _benign_object(oid: str, per_pid: dict, principals) -> bool:
     #     principal's identity appears in that list. We match the principal's own
     #     credential identity (sub/cookie) values, deterministically.
     member_lists = []
-    for pid, (ex, body) in per_pid.items():
+    for pid, (_ex, body) in per_pid.items():
         for ml in _collect_member_values(body):
             member_lists.append((pid, set(map(str, ml))))
     if member_lists:

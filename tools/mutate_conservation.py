@@ -1,7 +1,7 @@
 """Manual mutation testing on conservation.py: flip each decision branch, run the
 conservation+confirm test files, and require that EACH mutation kills >=1 test.
 A surviving mutant = a teethless test (a real gap)."""
-import os, sys, subprocess, shutil, importlib, re
+import os, sys, subprocess
 SRC = "authpath/conservation.py"
 TESTS = ["tests/test_conservation.py", "tests/test_conservation_e2e.py", "tests/test_conservation_confirm.py"]
 

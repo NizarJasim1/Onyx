@@ -70,7 +70,7 @@ def _build_demo() -> tuple[AuthPathEngine, list[dict]]:
     # Build an ordered timeline aligning probe steps with their traces.
     timeline = []
     probes = [s for s in steps if s.kind == "probe"]
-    for step, tr in zip(probes, engine.traces):
+    for step, tr in zip(probes, engine.traces, strict=False):
         timeline.append({
             "label": step.label,
             "expect": step.expect,
@@ -315,7 +315,7 @@ def _build_scan(cfg: dict) -> tuple[AuthPathEngine, list[dict]]:
     except ImportError:
         raise ScanError("the live HTTP client needs `requests` (pip install requests). "
                         "Also: real scans must run on YOUR machine — this environment "
-                        "has no network egress.")
+                        "has no network egress.") from None
 
     from .transport import HTTPTarget
     target = HTTPTarget(base_url, scope=ScopeConfig(
@@ -379,7 +379,7 @@ def _ping(cfg: dict) -> dict:
         import requests
     except ImportError:
         raise ScanError("connection test needs `requests` (pip install requests), "
-                        "run on your own machine.")
+                        "run on your own machine.") from None
     path = (cfg.get("path") or "/").strip() or "/"
     if not path.startswith("/"):
         path = "/" + path

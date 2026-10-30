@@ -31,7 +31,7 @@ def test_every_probe_matches_ground_truth():
     engine, steps = _run()
     probes = [s for s in steps if s.kind == "probe"]
     assert len(engine.traces) == len(probes)
-    for step, tr in zip(probes, engine.traces):
+    for step, tr in zip(probes, engine.traces, strict=False):
         got = "finding" if tr.outcome == "finding" else "clean"
         assert got == step.expect, (
             f"{step.label}: expected {step.expect}, got {tr.outcome}"
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     probes = [s for s in steps if s.kind == "probe"]
     ok = 0
     print("\nCALIBRATION (§9)\n" + "-" * 60)
-    for step, tr in zip(probes, engine.traces):
+    for step, tr in zip(probes, engine.traces, strict=False):
         got = "finding" if tr.outcome == "finding" else "clean"
         mark = "PASS" if got == step.expect else "FAIL"
         ok += got == step.expect

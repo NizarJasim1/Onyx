@@ -7,7 +7,7 @@ is byte-identical. No network.
 import sys, os, base64, json
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from authpath.nestedref import find_refs, swap_ref_full, swap_ref, RefField
+from authpath.nestedref import find_refs, swap_ref_full, RefField
 
 
 def _jwt(claims: dict) -> str:
@@ -48,7 +48,7 @@ def test_jwt_swap_is_refused():
     r = RefField("jwt", "sub", "usr_victim01", 90, swappable=False)
     try:
         swap_ref_full(headers={}, ref=r, new_value="usr_attacker")
-        assert False, "must refuse to swap a signed JWT claim"
+        raise AssertionError("must refuse to swap a signed JWT claim")
     except ValueError:
         pass
 

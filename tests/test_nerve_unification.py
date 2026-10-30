@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from authpath.equivalence import EquivalenceLedger
 from authpath.surface_map import identify
-from authpath.nerve_unification import DIMENSIONS, covered_axes, engine_for_axis
+from authpath.nerve_unification import covered_axes, engine_for_axis
 from authpath.models import HTTPRequest, HTTPResponse
 
 

@@ -9,7 +9,7 @@ quieter.
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "proving_world"))
-from authpath.models import HTTPRequest, HTTPResponse, Principal, Exchange
+from authpath.models import HTTPRequest, HTTPResponse, Principal
 from authpath.engine import AuthPathEngine
 from authpath.scope_guard import ScopeConfig
 from authpath.stealth import StealthProfile

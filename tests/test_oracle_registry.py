@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from authpath.models import EffectClass, StateProof
 from authpath.oracle_registry import (
-    DELTA_STATE_EFFECTS, DeltaStateOracle, Oracle, OracleRegistry, OracleVerdict,
+    DELTA_STATE_EFFECTS, Oracle, OracleRegistry, OracleVerdict,
     VerdictKind, build_default_registry,
 )
 

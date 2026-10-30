@@ -26,7 +26,6 @@ def _wire(payloads_over_time):
 
 
 def test_export_leak_confirmed_with_nonce_and_victim_datum():
-    a, s, n, poll = _wire([[f"id,name,email\n42,Victim,onyx+{n_val()}@x\n"]]) if False else (None,)*4
     # build explicitly (nonce needed inside payload)
     a = NonceAuthority(); s = NonceSeeker(a); n = a.mint("export"); s.register_planted(n)
     csv = f"id,name,secret\n42,VICTIM,SECRET-9931\n# request marker ONYX-{n.value}\n"

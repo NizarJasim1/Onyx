@@ -14,7 +14,7 @@ leads are worth probing. Nothing here makes or confirms a finding. Deterministic
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Iterable, Optional
 
 

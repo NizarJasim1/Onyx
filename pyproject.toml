@@ -46,3 +46,14 @@ pythonpath = [".", "tests"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["docs/notes"]
+
+[tool.ruff.lint]
+select = ["E9", "F", "B"]
+# B023: closures are always called inside the same loop iteration here.
+# F402: `field` loop variables shadow an unused-in-scope dataclasses import.
+ignore = ["B023", "F402"]

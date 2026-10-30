@@ -40,7 +40,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .structural import (
-    AbsenceState, StructuralFingerprint, fingerprint, shape_kind,
+    AbsenceState, fingerprint, shape_kind,
 )
 
 

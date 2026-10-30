@@ -4,7 +4,7 @@ _write_persisted composed with async_seam_follow — the exact composition the 2
 site uses. A fake target models an async commit that LANDS after a couple of polls,
 and one that never lands (optimistic ack). No network; deterministic.
 """
-import sys, os, itertools
+import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from authpath.engine import AuthPathEngine

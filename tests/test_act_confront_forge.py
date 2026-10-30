@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from authpath.act_confront import (confrontations_from_candidate, safe_confrontations,
-                                    _verb_for_action, Confrontation)
+                                    _verb_for_action)
 from authpath.scope_guard import ScopeConfig, ScopeGuard
 
 

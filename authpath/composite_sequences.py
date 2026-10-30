@@ -95,7 +95,7 @@ a fixed order; no set iteration reaches the output.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
 # Hard ceilings. The brief's depth-5 over a branching machine is b^5 paths, so the
 # caps are the difference between a worklist and a hang.
@@ -552,5 +552,5 @@ def composite_from_har(har: dict, in_scope_hosts=None, frontend_contract=None,
         except Exception:                    # noqa: BLE001
             continue
     sres = state_plan(inf, enabled=True)
-    setattr(sres, "_inferrer", inf)
+    sres._inferrer = inf
     return plan(sres, exchanges, parent_map, max_depth, enabled=True)

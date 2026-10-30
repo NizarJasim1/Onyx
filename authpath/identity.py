@@ -50,7 +50,7 @@ only if a tester-controlled input is reflected into it. Same discipline as
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 from .models import Candidate, EffectClass, StateProof

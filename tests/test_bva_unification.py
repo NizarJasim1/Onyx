@@ -10,7 +10,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from authpath.bva_unification import (THE_LAW, INSTANCES, instance_names,
+from authpath.bva_unification import (INSTANCES, instance_names,
                                       declaration_channel_instances)
 from authpath.broadcast import _present_fields
 from authpath.engine import AuthPathEngine

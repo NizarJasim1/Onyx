@@ -33,11 +33,9 @@ Deterministic and pure: the derivation issues no requests and uses no clock.
 from __future__ import annotations
 
 import re as _re
-from dataclasses import dataclass, field
-from typing import Iterable, Optional
+from typing import Iterable
 
 from .discovery import Endpoint, _infer_effect, _idor_score
-from .models import HTTPRequest
 
 _PARAM = _re.compile(r"\{[^}]+\}")
 
@@ -157,7 +155,7 @@ def _derive_from_template(g: SurfaceGraph, method: str, template: str) -> None:
 
     # parent chain: walk up the (collection, id) pairs
     parents = _parent_templates(segs)
-    for ptemplate, kind in parents:
+    for ptemplate, _kind in parents:
         for v in (_ITEM_VERBS if ptemplate.endswith("{id}") else _COLLECTION_VERBS):
             _add_endpoint(g, v, ptemplate,
                           "derived-parent" if v == "GET" else "derived-method")

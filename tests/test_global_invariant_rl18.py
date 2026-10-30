@@ -110,7 +110,7 @@ def test_flag_off_byte_identical():
     t = _HierTarget()
     eng = _engine(t, gi=False)
     _baseline(eng, t)
-    tr = eng.analyze(make_exchange(t, HTTPRequest("GET", "/api/docs/D1"), D))
+    eng.analyze(make_exchange(t, HTTPRequest("GET", "/api/docs/D1"), D))
     assert not any(f.effect.value == "EMERGENT_BREAK" for f in eng.findings)
 
 

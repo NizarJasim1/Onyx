@@ -103,12 +103,12 @@ the output; probes are deduplicated on their full descriptor.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
 from .surface_map import (
     ResourceIdentity, SurfaceLedger, identify, classify_door,
     exposed_sensitive_fields, _normalise_id, _singular,
-    DOOR_CANONICAL, DOOR_LIST, DOOR_GRAPHQL, DOOR_SEARCH, DOOR_OTHER,
+    DOOR_CANONICAL, DOOR_LIST,
 )
 
 _MAX_PROBES = 500
@@ -379,7 +379,7 @@ def plan(ledger: DoorLedger, surface=None, enabled: bool = False) -> DoorMapResu
         for kind, rec in sorted(doors.items()):
             if kind == DOOR_CANONICAL:
                 continue
-            for leaf, val in rec.sensitive_fields:
+            for leaf, _val in rec.sensitive_fields:
                 if canonical is not None and leaf not in dict(canonical.sensitive_fields):
                     res.contradictions.append({
                         "resource": str(ident), "principal": pid, "field": leaf,

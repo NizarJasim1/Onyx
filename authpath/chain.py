@@ -25,8 +25,8 @@ needs a hop ONYX cannot confirm (an external or unobservable effect) is not synt
 not every conceivable path, only the proven ones.
 """
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Callable, Optional, Any
+from dataclasses import dataclass
+from typing import Callable, Optional
 
 
 @dataclass(frozen=True)

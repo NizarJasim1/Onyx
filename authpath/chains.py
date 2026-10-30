@@ -21,11 +21,10 @@ behaves byte-identically.
 from __future__ import annotations
 
 import re
-import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from .models import (HTTPRequest, Principal, Finding, StateProof, PoC,
+from .models import (HTTPRequest, Finding, StateProof, PoC,
                      EffectClassification, EffectClass, ImpactClass, Severity,
                      ClassificationSource)
 from .scope_guard import ScopeVerdict

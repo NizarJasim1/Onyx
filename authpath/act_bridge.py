@@ -32,7 +32,7 @@ F7 PRE-MORTEM — the four abstain guards (written before the code):
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 from .attestation import _scalar_fields
 
@@ -445,7 +445,7 @@ class ActBridge:
         body = {field: privileged_value, companion_field: nonce.as_text()}
         patch = HTTPRequest("PATCH", self_path, host=host, body=body)
         if self.confirmer.scope.may_mutate(patch).verdict is ScopeVerdict.HALT:   # M-2
-            self.abstained.append((self_path, f"attributed mass-assign: write gated by scope — abstain"))
+            self.abstained.append((self_path, "attributed mass-assign: write gated by scope — abstain"))
             return None
         wresp = self.confirmer._read(patch, member)
         if wresp is None:                                                 # M-3

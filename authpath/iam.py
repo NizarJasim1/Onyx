@@ -14,7 +14,6 @@ for the comparison "is the granted role above what the actor holds?".
 """
 from __future__ import annotations
 
-import re
 from typing import Optional
 
 # Declared rank ladder. Coarse on purpose — we only ever compare ranks, never

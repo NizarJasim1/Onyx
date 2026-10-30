@@ -787,8 +787,8 @@ class CrossSurfaceConsistencyLaw(Law):
             return self._pass("non-success door exposes nothing")
 
         from .surface_map import (
-            classify_door, identify, exposed_sensitive_fields,
-            DOOR_CANONICAL, _normalise_id,
+            classify_door, exposed_sensitive_fields,
+            DOOR_CANONICAL,
         )
         req = ctx.exchange.request
         pqreg = getattr(ledger, "pq_registry", None)
@@ -859,7 +859,7 @@ class CrossSurfaceConsistencyLaw(Law):
         attributed to that element's OWN identity so the comparison is never
         cross-resource."""
         from .surface_map import (identify, classify_door, DOOR_LIST,
-                                  _normalise_id, _singular, ResourceIdentity)
+                                  _normalise_id, ResourceIdentity)
         out = []
         ident = identify(req, pq_registry)
         if ident is not None:
@@ -869,7 +869,7 @@ class CrossSurfaceConsistencyLaw(Law):
         door = classify_door(req)
         if door in (DOOR_LIST,):
             rtype = _list_resource_type(req)
-            for elem, eid in _iter_elements_with_ids(body):
+            for _elem, eid in _iter_elements_with_ids(body):
                 nid = _normalise_id(eid)
                 if rtype and nid:
                     out.append((ResourceIdentity(rtype, nid), body, eid))

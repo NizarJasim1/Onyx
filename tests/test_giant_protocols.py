@@ -9,8 +9,8 @@ decides truth, so precision is untouched.
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from authpath.protocol import (is_opaque_id, opaque_ids_in, batch_operations,
-                               grpc_transcoded_ids, extra_object_ids)
+from authpath.protocol import (is_opaque_id, batch_operations,
+                               grpc_transcoded_ids)
 from authpath.models import HTTPRequest, HTTPResponse, Principal, Exchange
 
 

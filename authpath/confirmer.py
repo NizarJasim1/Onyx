@@ -242,7 +242,6 @@ class Confirmer:
         k = getattr(self, "stability_k", 1)
         if k <= 1:
             return self.target.send(req, principal)
-        import json
         import uuid as _uuid
         from collections import Counter
         import math
@@ -867,7 +866,6 @@ class Confirmer:
     # -- COUPON ------------------------------------------------------------ #
     def _confirm_coupon(self, cand: Candidate) -> Optional[StateProof]:
         ev = cand.verdict.evidence
-        token = ev.get("token")
         actor = cand.exchange.principal
         # Idempotency proof: replay the redemption; if it yields an additional
         # effect (applied again), single-use enforcement is broken. Guarded by

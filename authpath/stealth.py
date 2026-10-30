@@ -28,7 +28,6 @@ are delivered; it never changes WHAT counts as a confirmation (the majority Δst
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Callable
-import math
 
 
 @dataclass

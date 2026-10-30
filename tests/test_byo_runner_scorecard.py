@@ -10,7 +10,7 @@ import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "external_targets"))
 from authpath.models import HTTPRequest, HTTPResponse, Principal
-from byo_runner import TargetConfig, run_target, SealedScorecard, TIER_T1, TIER_T2
+from byo_runner import TargetConfig, run_target, TIER_T1, TIER_T2
 
 
 class _Replica:

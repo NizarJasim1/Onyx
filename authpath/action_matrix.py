@@ -24,7 +24,7 @@ so with action testing off the engine behaves identically.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 _MUTATING = ("POST", "PUT", "PATCH", "DELETE")
 _IRREVERSIBLE = ("DELETE",)

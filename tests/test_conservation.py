@@ -25,7 +25,7 @@ from authpath.models import (
 )
 from authpath.eil import LawContext
 from authpath.conservation import (
-    AuthorityConservationLaw, differential_authority_attribution, AXIS_PROPERTY,
+    AuthorityConservationLaw, AXIS_PROPERTY,
 )
 
 

@@ -24,7 +24,6 @@ from authpath.scope_guard import ScopeConfig
 from authpath.transport import make_exchange
 from authpath.models import HTTPRequest, HTTPResponse, Principal
 from authpath.temporal_shape import AuthShapeLedger
-from authpath.structural import AbsenceState
 
 B = Principal("B", "Bob")
 

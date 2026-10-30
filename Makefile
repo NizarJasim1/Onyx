@@ -1,4 +1,4 @@
-.PHONY: test demo mutation gate ci clean
+.PHONY: test demo mutation gate lint ci clean
 PY ?= python3
 
 test:            ## run the full stdlib test suite (the canonical gate)
@@ -15,7 +15,10 @@ mutation:        ## run the mutation harnesses (fail below their floors)
 gate:            ## RL20 no-bare-metrics gate over judge-facing claims
 	$(PY) tools/check_claims.py
 
-ci: test demo mutation gate   ## everything CI runs, locally
+lint:            ## ruff (correctness rules)
+	ruff check authpath tests tools
+
+ci: test demo mutation gate lint   ## everything CI runs, locally
 	@echo "ALL GREEN"
 
 clean:

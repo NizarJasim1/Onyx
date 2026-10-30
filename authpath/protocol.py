@@ -19,7 +19,7 @@ Wall: raw binary protobuf / custom framing with no transcoding is not black-box
 introspectable; the operator supplies a decoder, or that surface abstains. Declared.
 """
 from __future__ import annotations
-import re, json, base64
+import re
 
 # an opaque object handle: long base64url / token-like, not a normal word or number-with-units
 _OPAQUE = re.compile(r"^[A-Za-z0-9_\-]{16,}={0,2}$")

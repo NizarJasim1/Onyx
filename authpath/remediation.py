@@ -19,7 +19,6 @@ nothing: a finding that was confirmed is still confirmed; this only explains it.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from .models import EffectClass
 

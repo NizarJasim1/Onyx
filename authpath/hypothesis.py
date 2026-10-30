@@ -42,7 +42,7 @@ or applied ⇒ byte-identical to the pre-RL17 engine.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)

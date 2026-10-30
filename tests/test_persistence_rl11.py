@@ -15,7 +15,6 @@ Properties under guard:
   5. REPLAY    — a single-use token redeemed across sessions exceeds its limit and
                  is confirmed; within-limit stays clean (no double-count).
 """
-import json
 import os
 import tempfile
 
@@ -64,7 +63,7 @@ def test_no_raw_value_on_disk():
 def test_privacy_audit_rejects_raw_key():
     try:
         _assert_sealed({"credentials": {"Bearer raw": {"fp": "Bearer raw"}}})
-        assert False, "should have raised"
+        raise AssertionError("should have raised")
     except ValueError:
         pass
 

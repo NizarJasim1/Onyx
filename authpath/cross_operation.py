@@ -125,10 +125,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
 from .frontend_contract import (
-    JSSource, SourceReport, _lex, _LexError, _skip_balanced,
+    SourceReport, _lex, _LexError, _skip_balanced,
     UNLEXABLE, OVER_BUDGET, EMPTY_SOURCE,
     _MAX_SOURCE_BYTES, _MAX_TOTAL_BYTES, _MAX_SCAN_SPAN,
 )

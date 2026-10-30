@@ -103,7 +103,7 @@ def test_cannot_plant_foreign_nonce():
     foreign = b.mint("p")
     try:
         s.register_planted(foreign)
-        assert False, "should have refused a foreign nonce"
+        raise AssertionError("should have refused a foreign nonce")
     except ValueError:
         pass
 

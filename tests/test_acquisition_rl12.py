@@ -19,7 +19,7 @@ Properties under guard:
 from authpath.models import Principal, HTTPRequest, HTTPResponse
 from authpath.scope_guard import ScopeGuard, ScopeConfig
 from authpath.economy import BudgetLedger
-from authpath.acquisition import SpecAcquirer, OPENAPI_PATHS, GRAPHQL_PATHS
+from authpath.acquisition import SpecAcquirer
 from authpath.engine import AuthPathEngine
 from authpath.surface import synth_probes
 from authpath.transport import make_exchange

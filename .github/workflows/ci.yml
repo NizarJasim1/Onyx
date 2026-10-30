@@ -21,8 +21,21 @@ jobs:
         run: python tools/mutate_conservation.py
       - name: Mutation — evidence discipline (floor 8/8)
         run: python tools/mutate_evidence.py
+      - name: Mutation — certificate (floor 10/10)
+        run: python tools/mutate_certificate.py
       - name: RL20 no-bare-metrics gate
         run: python tools/check_claims.py
+
+  lint:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check authpath tests tools
 
   pytest:
     name: pytest

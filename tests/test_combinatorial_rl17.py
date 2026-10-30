@@ -23,7 +23,7 @@ from authpath.engine import AuthPathEngine
 from authpath.scope_guard import ScopeConfig
 from authpath.transport import make_exchange
 from authpath.models import HTTPRequest, HTTPResponse, Principal
-from authpath.hypothesis import HypothesisEngine, StructuralRule
+from authpath.hypothesis import HypothesisEngine
 
 B = Principal("B", "Bob")
 

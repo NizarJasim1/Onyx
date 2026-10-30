@@ -34,7 +34,7 @@ F7 PRE-MORTEM for the confirmation itself:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 from .attestation import AttestationLedger, _scalar_fields
 from .ownership_pointer import OwnershipPointerLedger

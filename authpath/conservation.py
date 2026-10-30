@@ -38,10 +38,10 @@ RL5 any ambiguity (no owner baseline, multiple legitimate holders) -> abstain.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
-from .models import EffectClass, ImpactClass, Verdict, LawVerdict, ValueOrigin
-from .provenance import ValueClass, extract_values
+from .models import EffectClass, ImpactClass, LawVerdict, ValueOrigin
+from .provenance import ValueClass
 from .eil import Law, LawContext
 
 

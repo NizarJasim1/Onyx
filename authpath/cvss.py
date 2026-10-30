@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from math import ceil
 
-from .models import EffectClass, Finding, ImpactClass
+from .models import EffectClass, Finding
 
 
 # ----- CVSS 3.1 metric scoring tables ---------------------------------- #

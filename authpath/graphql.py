@@ -23,10 +23,9 @@ Design constraints:
 
 from __future__ import annotations
 
-import json
 import re
-from dataclasses import dataclass, field
-from typing import Any, Iterator
+from dataclasses import dataclass
+from typing import Any
 
 
 # --------------------------------------------------------------------------- #
@@ -137,7 +136,7 @@ def _root_selections(query: str) -> tuple[list[str], list[str]]:
         return aliases, roots
     depth = 0
     body_chars = []
-    for i, ch in enumerate(query[start:]):
+    for _i, ch in enumerate(query[start:]):
         if ch == "{":
             depth += 1
             if depth == 1:

@@ -24,8 +24,8 @@ structural-contract basis just as strictly as value-match.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 from .models import Candidate, EffectClass, StateProof
 from .oracle_registry import Oracle, OracleVerdict, VerdictKind

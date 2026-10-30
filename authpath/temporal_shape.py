@@ -36,8 +36,8 @@ byte-identical to the pre-RL16 engine.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 from .structural import fingerprint, divergence, AbsenceState
 

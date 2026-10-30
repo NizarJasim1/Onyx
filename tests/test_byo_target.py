@@ -11,7 +11,7 @@ sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "proving_world")
 
 def test_byo_runner_scores_and_holds_zero_fp():
     from world import World
-    from harness import WorldTarget, _endpoint_of
+    from harness import WorldTarget
     from authpath.models import Principal
     from authpath.engine import AuthPathEngine
     from authpath.scope_guard import ScopeConfig

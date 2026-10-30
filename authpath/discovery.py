@@ -112,7 +112,7 @@ def parse_openapi(doc: dict) -> list:
         full = re.sub(r"/{2,}", "/", full) or "/"
         has_param = bool(_PARAM.search(full))
         params = _PARAM.findall(full)
-        for method, op in item.items():
+        for method, _op in item.items():
             mu = method.upper()
             if mu not in ("GET", "POST", "PUT", "PATCH", "DELETE"):
                 continue

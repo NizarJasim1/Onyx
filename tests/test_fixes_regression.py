@@ -174,7 +174,7 @@ def test_transport_governance():
     """OBSTACLE 2: legitimate transport governance — researcher attribution on
     every request, ONE shared egress for all principals (IP-stability invariant),
     a working rate governor, and identical default behaviour when unconfigured."""
-    import sys, types, time
+    import sys, types
     sent=[]
     fake=types.ModuleType("requests")
     def reqfn(method,url,params=None,json=None,headers=None,verify=True,timeout=10,proxies=None):
@@ -537,7 +537,7 @@ def test_gap3_action_matrix():
     from authpath import action_matrix as A
     from authpath.chains import ChainRunner
     from authpath.engine import AuthPathEngine
-    from authpath.models import HTTPRequest, HTTPResponse, Principal
+    from authpath.models import HTTPResponse, Principal
     from authpath.scope_guard import ScopeConfig
     actions=[{"owner_pid":"A","method":"PUT","endpoint":"PUT /o/{id}/cancel",
               "path":"/o/42/cancel","object_id":"42","readback_path":"/o/42"}]

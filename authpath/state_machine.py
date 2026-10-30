@@ -423,7 +423,7 @@ def plan(inferrer: StateInferrer, role_matrix=None,
     # ---- stage 2: transitions, with honest attribution ------------------------
     raw: dict = {}
     for (rtype, _rid), line in sorted(timelines.items()):
-        for prev, cur in zip(line, line[1:]):
+        for prev, cur in zip(line, line[1:], strict=False):
             if prev.state == cur.state:
                 continue
             # A mutation of ours sitting on the later observation is the only

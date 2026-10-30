@@ -1,7 +1,7 @@
 """Proof-Carrying Measurement: the evidence bundle must verify when honest and be
 caught when tampered or lied about — by a verifier that re-derives findings by
 replaying the raw transcript through ONYX, trusting nothing the runner claims."""
-import os, sys, copy
+import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "p0"))
 from authpath.engine import AuthPathEngine

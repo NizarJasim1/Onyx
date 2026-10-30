@@ -22,7 +22,7 @@ laziness. ONYX discovers the referenced+derivable fraction, which is where a mat
 target's own disclosures already leak most of its real surface.
 """
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import re
 
 _URL = re.compile(r"""https?://[^\s"'<>]+|(?<![\w])/(?:api|v\d|graphql|internal|admin|rest)[^\s"'<>]*""", re.I)

@@ -12,7 +12,7 @@ from types import SimpleNamespace
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from authpath.models import EffectClass, StateProof
+from authpath.models import EffectClass
 from authpath.tenant import CrossTenantOracle, TenantIsolationProbe
 from authpath.oracle_registry import VerdictKind, build_default_registry
 

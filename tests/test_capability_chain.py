@@ -8,7 +8,7 @@ chaining raises the severity/recall of escalation paths but can never manufactur
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from authpath.chain import Capability, Primitive, CapabilityGraph, Chain
+from authpath.chain import Capability, Primitive, CapabilityGraph
 
 
 def _two_hop_graph(second_confirmed=True, second_fid="F2"):
