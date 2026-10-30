@@ -15,6 +15,10 @@ finding.
 
 The Python package is called `authpath`. It runs on the standard library alone.
 
+![ONYX control center during a demo sweep](docs/images/control-center.jpg)
+<sub>The control center during a demo sweep on the built-in calibration target.
+Red edges are cross-principal paths that were confirmed by a state read-back.</sub>
+
 ```
 $ python -m authpath demo        # self-authored calibration target
 ...
